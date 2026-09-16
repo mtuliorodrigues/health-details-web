@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Details</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand__icon">
+          <svg viewBox="0 0 24 24" aria-label="Logo Health Details">
+            <path d="M12 3a9 9 0 0 0-9 9c0 5.9 9 11 9 11s9-5.1 9-11a9 9 0 0 0-9-9z" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <path d="M12 7.5c2.8 2.6 4.2 4.5 4.2 6.2a4.2 4.2 0 1 1-8.4 0c0-1.7 1.4-3.6 4.2-6.2z" fill="none" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </span>
+        <span class="brand__text">Health Details</span>
+      </div>
+
+      <nav class="navigation">
+        <div class="nav-label">Painel</div>
+        <a class="nav-link active" href="#">
+          <span class="nav-link__icon">▦</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="#">
+          <span class="nav-link__icon">◌</span>
+          <span>Dispositivos</span>
+        </a>
+        <a class="nav-link" href="#">
+          <span class="nav-link__icon">⌁</span>
+          <span>Rede</span>
+        </a>
+      </nav>
+
+      <section class="sidebar-card">
+        <span class="sidebar-card__label">Status da rede</span>
+        <div class="sidebar-card__status">
+          <span class="pulse-dot"></span>
+          <span class="sidebar-card__text">Operacional</span>
+        </div>
+      </section>
+
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar__left">
+          <h1>Health Details</h1>
+        </div>
+        <div class="topbar__right">
+          <button class="icon-button theme-button" id="themeToggle" aria-label="Alternar tema" aria-pressed="false">
+            <span class="theme-icon" id="themeIcon">🌙</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel panel-form">
+          <div class="verification">
+            <div class="control-label">IP do dispositivo</div>
+            <div class="input-row">
+              <input type="text" id="ipInput" value="192.168.10.24" autocomplete="off" />
+              <select id="vendorInput" aria-label="Tipo do dispositivo">
+                <option value="mikrotik">MikroTik</option>
+                <option value="ubiquiti-ac">Ubiquiti AC</option>
+                <option value="ubiquiti-m5">Ubiquiti M5</option>
+              </select>
+              <button class="primary-button" id="scanButton">
+                <span>Coletar</span>
+              </button>
+            </div>
+            <div class="status-text" id="scanStatus">Pronto para consultar</div>
+          </div>
+
+          <section class="device-profile">
+            <div class="device-profile__header">
+              <div>
+                <span class="panel__kicker">Informações do host</span>
+              </div>
+              <span class="device-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="2" />
+                  <path d="M8 18h8" fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </span>
+            </div>
+            <div class="device-grid">
+              <div class="device-detail">
+                <span class="device-detail__label">Nome do dispositivo</span>
+                <span class="device-detail__value" id="deviceSignalTx">n/a</span>
+              </div>
+              <div class="device-detail">
+                <span class="device-detail__label">Uptime do dispositivo</span>
+                <span class="device-detail__value" id="deviceSignalRx">n/a</span>
+              </div>
+              <div class="device-detail">
+                <span class="device-detail__label">Clientes conectados</span>
+                <span class="device-detail__value" id="deviceCcq">n/a</span>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="panel panel-health">
+          <section class="panel__header">
+            <div>
+              <span class="panel__kicker">Monitoramento</span>
+              <h2>Diagnóstico de rede</h2>
+            </div>
+            <span class="panel__badge" id="healthBadge">Aguardando coleta</span>
+          </section>
+
+          <section class="monitor-stack">
+            <section class="monitor-window">
+              <div class="monitor-window__header">
+                <span class="monitor-window__title">Ping</span>
+                <button class="monitor-action" id="pingButton" disabled>Executar ping</button>
+              </div>
+              <div class="monitor-window__body">
+                <div class="monitor-window__text" id="pingValue">Disponível após a coleta de clientes.</div>
+              </div>
+            </section>
+
+            <section class="monitor-window">
+              <div class="monitor-window__header">
+                <span class="monitor-window__title">Tracert</span>
+                <button class="monitor-action" id="tracertButton" disabled>Executar tracert</button>
+              </div>
+              <div class="monitor-window__body">
+                <div class="monitor-window__text" id="tracertValue">Disponível após a coleta de clientes.</div>
+              </div>
+            </section>
+          </section>
+        </section>
+      </section>
+
+      <section class="panel clients-panel">
+        <section class="panel__header">
+          <div>
+            <span class="panel__kicker">Clientes conectados</span>
+            <h2>Dados de rádio</h2>
+          </div>
+          <span class="panel__badge" id="clientsBadge">0 cliente(s)</span>
+        </section>
+        <div class="clients-table-wrap">
+          <table class="clients-table">
+            <thead><tr><th>Radio Name</th><th>MAC Address</th><th>Uptime</th><th>Tx/Rx Signal Strength</th><th>Tx/Rx CCQ</th></tr></thead>
+            <tbody id="clientsTableBody"><tr><td colspan="5">Faça uma coleta para listar os clientes.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel collection-log-panel">
+        <section class="panel__header">
+          <div>
+            <span class="panel__kicker">Atividade da coleta</span>
+            <h2>Log em tempo real</h2>
+          </div>
+        </section>
+        <div class="collection-log" id="collectionLog" aria-live="polite"><div>Aguardando uma coleta.</div></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
