@@ -27,6 +27,7 @@
             <div class="input-row">
               <input type="text" id="ipInput" value="192.168.10.24" autocomplete="off" />
               <select id="vendorInput" aria-label="Tipo do dispositivo">
+                <option value="auto">Detectar automaticamente</option>
                 <option value="mikrotik">MikroTik</option>
                 <option value="ubiquiti-ac">Ubiquiti AC</option>
                 <option value="ubiquiti-m5">Ubiquiti M5</option>
@@ -41,7 +42,7 @@
           <section class="device-profile">
             <div class="device-profile__header">
               <div>
-                <span class="panel__kicker">Informações do host</span>
+                <span class="panel__kicker">Informações do host <span id="detectedDevice">— aguardando detecção</span></span>
               </div>
               <span class="device-icon">
                 <svg viewBox="0 0 24 24">

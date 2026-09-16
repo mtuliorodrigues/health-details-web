@@ -53,29 +53,35 @@ function renderCollectionData({ device, clients }) {
   setText('deviceSignalTx', device.identity || device.vendorLabel);
   setText('deviceSignalRx', device.uptime);
   setText('deviceCcq', String(clientCount));
-  renderClients(clients);
+  setText('detectedDevice', `— ${device.vendorLabel}`);
+  renderClients(clients, device.vendor);
   if (healthBadge) {
     healthBadge.textContent = clientCount ? `${clientCount} cliente(s)` : 'Sem clientes';
     healthBadge.className = 'panel__badge';
   }
 }
 
-function renderClients(clients = []) {
+function renderClients(clients = [], vendor) {
   const body = byId('clientsTableBody');
   const badge = byId('clientsBadge');
   if (!body) return;
   body.replaceChildren();
+  const header = body.closest('table')?.querySelector('thead tr');
+  if (header) {
+    const labels = vendor === 'ubiquiti-m5' ? ['Device Name', 'Connection Time', 'Tx Signal', 'Rx Signal', 'CCQ%'] : vendor?.startsWith('ubiquiti') ? ['Device Name', 'Signal', 'Remote Signal', 'Connection Time'] : ['Radio Name', 'MAC Address', 'Uptime', 'Tx/Rx Signal Strength', 'Tx/Rx CCQ'];
+    header.replaceChildren(...labels.map((label) => { const cell = document.createElement('th'); cell.textContent = label; return cell; }));
+  }
   if (!clients.length) {
     const row = document.createElement('tr');
     const cell = document.createElement('td');
-    cell.colSpan = 5;
+    cell.colSpan = vendor === 'ubiquiti-m5' ? 5 : vendor?.startsWith('ubiquiti') ? 4 : 5;
     cell.textContent = 'Nenhum cliente conectado foi encontrado.';
     row.appendChild(cell);
     body.appendChild(row);
   } else {
     clients.forEach((client) => {
       const row = document.createElement('tr');
-      [client.radioName, client.mac, client.uptime, client.txRxSignalStrength, client.txRxCcq]
+      (vendor === 'ubiquiti-m5' ? [client.radioName, client.uptime, client.txRxSignalStrength, client.rxSignal, client.txRxCcq] : vendor?.startsWith('ubiquiti') ? [client.radioName, client.txRxSignalStrength, client.txRxCcq, client.uptime] : [client.radioName, client.mac, client.uptime, client.txRxSignalStrength, client.txRxCcq])
         .forEach((value) => { const cell = document.createElement('td'); cell.textContent = value ?? '—'; row.appendChild(cell); });
       body.appendChild(row);
     });
