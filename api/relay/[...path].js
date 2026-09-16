@@ -6,11 +6,10 @@ module.exports = async function relayProxy(req, res) {
   const agentOrigin = process.env.AGENT_ORIGIN;
   if (!agentOrigin) return res.status(503).json({ status: 'error', message: 'Agente remoto não configurado.' });
 
-  const path = Array.isArray(req.query.path) ? req.query.path.join('/') : req.query.path || '';
+  const incomingUrl = new URL(req.url, 'http://localhost');
+  const path = incomingUrl.pathname.replace(/^\/api\/relay\/?/, '');
   const target = new URL(`/${path}`, agentOrigin);
-  for (const [key, value] of Object.entries(req.query)) {
-    if (key !== 'path' && typeof value === 'string') target.searchParams.set(key, value);
-  }
+  incomingUrl.searchParams.forEach((value, key) => target.searchParams.append(key, value));
 
   const headers = Object.fromEntries(Object.entries(req.headers)
     .filter(([key]) => !HOP_BY_HOP_HEADERS.has(key.toLowerCase()) && key.toLowerCase() !== 'host'));
