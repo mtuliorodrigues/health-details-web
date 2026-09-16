@@ -11,7 +11,7 @@
   --text-soft: #a6b8cb;
   --text-light: #6f8499;
   --muted: #8297aa;
-  --line: #1d3448;
+  --line: #2b5570;
   --green: #14d69a;
   --green-dark: #0dbb84;
   --green-soft: #083b35;
@@ -118,7 +118,7 @@ body {
 }
 
 .sidebar-card {
-  margin-top: 16px;
+  margin-top: auto;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
@@ -171,6 +171,7 @@ body {
 
 .main {
   flex: 1;
+  min-width: 0;
   padding: 34px;
 }
 
@@ -905,7 +906,11 @@ body {
 
 .collection-log { background: #050c14; color: #b7d9d6; }
 .clients-table th { background: #0d1c2b; }
-.panel { border-color: #193248; }
+.panel { border-color: #2b5d7c; box-shadow: 0 0 0 1px rgba(87, 170, 207, .08), 0 16px 38px rgba(0, 0, 0, .2); }
+.monitor-window { border-color: #2b5d7c; }
+.device-detail { border-color: #2b5570; }
+.usage-steps { margin: 0; padding: 0 20px 0 36px; color: var(--text-soft); line-height: 1.65; }
+.usage-steps li + li { margin-top: 7px; }
 
 .app-view[hidden],
 .collection-modal[hidden] { display: none; }
@@ -963,7 +968,7 @@ body {
 .history-dropdown__meta { color: var(--text-soft); font-size: 13px; }
 .history-dropdown__content { padding: 22px; }
 .history-dropdown__content h3 { margin: 24px 0 0; font-size: 17px; }
-.history-actions { display: flex; justify-content: flex-end; }
+.history-actions { display: flex; justify-content: flex-end; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
 .history-delete-button {
   border: 1px solid rgba(239, 107, 115, .5);
   border-radius: 9px;
@@ -1040,14 +1045,17 @@ body {
 
 @media (max-width: 960px) {
   .history-host-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sidebar { padding: 20px 22px; gap: 18px; }
+  .sidebar-card { margin-top: 0; }
 }
 
 @media (max-width: 560px) {
   .history-heading { align-items: flex-start; flex-direction: column; }
   .history-host-grid { grid-template-columns: 1fr; }
   .sidebar { padding: 16px; gap: 16px; }
-  .sidebar-card { display: none; }
-  .navigation { display: flex; gap: 8px; margin: 0; }
+  .sidebar-card { display: block; margin-top: 0; padding: 13px 14px; }
+  .sidebar-card__status { margin-top: 8px; }
+  .navigation { display: flex; gap: 8px; margin: 0; flex-wrap: wrap; }
   .nav-label { display: none; }
-  .nav-link { margin: 0; padding: 10px; }
+  .nav-link { width: auto; margin: 0; padding: 10px; }
 }

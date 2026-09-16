@@ -5,7 +5,6 @@ const scanButton = byId('scanButton');
 const scanStatus = byId('scanStatus');
 const healthBadge = byId('healthBadge');
 const pingButton = byId('pingButton');
-const tracertButton = byId('tracertButton');
 const themeToggle = byId('themeToggle');
 const themeIcon = byId('themeIcon');
 const dashboardNav = byId('dashboardNav');
@@ -65,10 +64,6 @@ function renderCommandOutput(targetId, output, fallback) {
 
 function renderPing(ping) {
   renderCommandOutput('pingValue', ping?.output, 'Ping não retornou saída.');
-}
-
-function renderTraceroute(traceroute) {
-  renderCommandOutput('tracertValue', traceroute?.output, 'Tracert não retornou saída.');
 }
 
 function renderCollectionData({ device, clients }) {
@@ -183,7 +178,6 @@ function renderHistory(history = []) {
     deleteButton.textContent = 'Excluir coleta';
     deleteButton.addEventListener('click', () => deleteHistoryItem(item.id, deleteButton));
     actions.appendChild(deleteButton);
-    content.appendChild(actions);
     const host = document.createElement('div');
     host.className = 'history-host-grid';
     [['IP', item.ip], ['Tipo', item.vendor_label || item.vendor], ['Nome', item.identity], ['Uptime', item.uptime], ['Clientes', item.client_count]].forEach(([label, value]) => {
@@ -226,6 +220,7 @@ function renderHistory(history = []) {
       wrap.appendChild(table);
       content.appendChild(wrap);
     }
+    content.appendChild(actions);
     details.append(summary, content);
     historyList.appendChild(details);
   });
@@ -267,21 +262,20 @@ function collectWithLiveLog(ip, vendor) {
   });
 }
 
-async function runDiagnostic(type) {
-  const button = type === 'ping' ? pingButton : tracertButton;
+async function runPingDiagnostic() {
+  const button = pingButton;
   const ip = ipInput?.value.trim();
   if (!ip || !button) return;
   button.disabled = true;
   button.textContent = 'Consultando…';
   try {
-    const response = await fetch(apiUrl(`/api/devices/diagnostics/${type}`), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
+    const response = await fetch(apiUrl('/api/devices/diagnostics/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.message || 'Falha no diagnóstico.');
-    if (type === 'ping') renderPing(payload.ping);
-    else renderTraceroute(payload.traceroute);
+    renderPing(payload.ping);
   } finally {
     button.disabled = false;
-    button.textContent = type === 'ping' ? 'Executar ping' : 'Executar tracert';
+    button.textContent = 'Executar ping';
   }
 }
 
@@ -294,7 +288,6 @@ async function verifyDevice() {
 
   scanButton.disabled = true;
   pingButton.disabled = true;
-  tracertButton.disabled = true;
   setRadioDetails('n/a');
   scanStatus.textContent = 'Consultando dispositivo…';
   setCollectionModal(true, 'Iniciando consulta…');
@@ -304,7 +297,6 @@ async function verifyDevice() {
     const payload = await collectWithLiveLog(ip, vendorInput?.value || 'mikrotik');
     renderCollectionData(payload);
     pingButton.disabled = false;
-    tracertButton.disabled = false;
     scanStatus.textContent = `Consulta concluída às ${new Date(payload.device.collectedAt).toLocaleTimeString('pt-BR')}.`;
   } catch (error) {
     setRadioDetails('err');
@@ -324,8 +316,7 @@ function applyTheme(theme) {
 }
 
 scanButton?.addEventListener('click', verifyDevice);
-pingButton?.addEventListener('click', () => runDiagnostic('ping'));
-tracertButton?.addEventListener('click', () => runDiagnostic('traceroute'));
+pingButton?.addEventListener('click', runPingDiagnostic);
 dashboardNav?.addEventListener('click', () => showView('dashboard'));
 historyNav?.addEventListener('click', () => showView('history'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });

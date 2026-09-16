@@ -88,7 +88,7 @@
         <section class="panel panel-health">
           <section class="panel__header">
             <div>
-              <span class="panel__kicker">Monitoramento</span>
+              <span class="panel__kicker">Ferramentas</span>
               <h2>Diagnóstico de rede</h2>
             </div>
             <span class="panel__badge" id="healthBadge">Aguardando coleta</span>
@@ -105,13 +105,17 @@
               </div>
             </section>
 
-            <section class="monitor-window">
+            <section class="monitor-window usage-window" aria-labelledby="usageTitle">
               <div class="monitor-window__header">
-                <span class="monitor-window__title">Tracert</span>
-                <button class="monitor-action" id="tracertButton" disabled>Executar tracert</button>
+                <span class="monitor-window__title" id="usageTitle">Como usar</span>
               </div>
               <div class="monitor-window__body">
-                <div class="monitor-window__text" id="tracertValue">Disponível após a coleta de clientes.</div>
+                <ol class="usage-steps">
+                  <li>Informe o IP privado do equipamento.</li>
+                  <li>Deixe em “Detectar automaticamente” ou escolha o modelo.</li>
+                  <li>Clique em “Coletar” e aguarde a conclusão.</li>
+                  <li>Use o ping e consulte as coletas anteriores em Histórico.</li>
+                </ol>
               </div>
             </section>
           </section>
