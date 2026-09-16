@@ -8,6 +8,21 @@
 </head>
 <body>
   <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="brand">
+        <div class="brand__icon">H</div>
+        <span class="brand__text">Health Details</span>
+      </div>
+      <nav class="navigation">
+        <div class="nav-label">Menu</div>
+        <button class="nav-link active" id="dashboardNav" type="button"><span class="nav-link__icon">⌂</span>Dashboard</button>
+        <button class="nav-link" id="historyNav" type="button"><span class="nav-link__icon">◷</span>Histórico</button>
+      </nav>
+      <div class="sidebar-card">
+        <div class="sidebar-card__label">Agente</div>
+        <div class="sidebar-card__status"><span class="pulse-dot"></span><span class="sidebar-card__text">Online</span></div>
+      </div>
+    </aside>
     <main class="main">
       <section class="topbar">
         <div class="topbar__left">
@@ -20,6 +35,7 @@
         </div>
       </section>
 
+      <section class="app-view" id="dashboardView">
       <section class="content-grid">
         <section class="panel panel-form">
           <div class="verification">
@@ -125,7 +141,27 @@
         </section>
         <div class="collection-log" id="collectionLog" aria-live="polite"><div>Aguardando uma coleta.</div></div>
       </section>
+      </section>
+
+      <section class="app-view" id="historyView" hidden>
+        <section class="history-heading">
+          <div>
+            <span class="panel__kicker">Coletas salvas</span>
+            <h2>Histórico</h2>
+            <p>Abra uma coleta para consultar o resumo do host e os clientes encontrados.</p>
+          </div>
+          <span class="panel__badge" id="historyBadge">Carregando</span>
+        </section>
+        <section class="history-list" id="historyList" aria-live="polite"></section>
+      </section>
     </main>
+    <div class="collection-modal" id="collectionModal" role="dialog" aria-modal="true" aria-labelledby="collectionModalTitle" hidden>
+      <div class="collection-modal__card">
+        <span class="collection-spinner" aria-hidden="true"></span>
+        <h2 id="collectionModalTitle">Consultando dispositivo</h2>
+        <p id="collectionModalStatus">Preparando a coleta…</p>
+      </div>
+    </div>
   </div>
 
   <script src="app-settings.js"></script>

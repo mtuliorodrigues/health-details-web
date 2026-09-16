@@ -8,6 +8,14 @@ const pingButton = byId('pingButton');
 const tracertButton = byId('tracertButton');
 const themeToggle = byId('themeToggle');
 const themeIcon = byId('themeIcon');
+const dashboardNav = byId('dashboardNav');
+const historyNav = byId('historyNav');
+const dashboardView = byId('dashboardView');
+const historyView = byId('historyView');
+const historyList = byId('historyList');
+const historyBadge = byId('historyBadge');
+const collectionModal = byId('collectionModal');
+const collectionModalStatus = byId('collectionModalStatus');
 const apiBaseUrl = window.HEALTH_DETAILS_API_URL?.replace(/\/$/, '') || '';
 
 function apiUrl(path) {
@@ -28,6 +36,21 @@ function setText(id, value) {
 
 function setRadioDetails(value) {
   ['deviceSignalTx', 'deviceSignalRx', 'deviceCcq'].forEach((id) => setText(id, value));
+}
+
+function setCollectionModal(visible, message = 'Preparando a coleta…') {
+  if (!collectionModal) return;
+  collectionModal.hidden = !visible;
+  if (collectionModalStatus) collectionModalStatus.textContent = message;
+}
+
+function showView(view) {
+  const showHistory = view === 'history';
+  if (dashboardView) dashboardView.hidden = showHistory;
+  if (historyView) historyView.hidden = !showHistory;
+  dashboardNav?.classList.toggle('active', !showHistory);
+  historyNav?.classList.toggle('active', showHistory);
+  if (showHistory) loadHistory();
 }
 
 function renderCommandOutput(targetId, output, fallback) {
@@ -96,6 +119,108 @@ function appendCollectionLog(message) {
   line.textContent = `[${new Date().toLocaleTimeString('pt-BR')}] ${message}`;
   log.appendChild(line);
   log.scrollTop = log.scrollHeight;
+  if (collectionModalStatus) collectionModalStatus.textContent = message;
+}
+
+function formatCollectedAt(value) {
+  return value ? new Date(value).toLocaleString('pt-BR') : 'Data indisponível';
+}
+
+function appendHistoryCell(row, value) {
+  const cell = document.createElement('td');
+  cell.textContent = value ?? '—';
+  row.appendChild(cell);
+}
+
+function renderHistory(history = []) {
+  if (!historyList || !historyBadge) return;
+  historyList.replaceChildren();
+  historyBadge.textContent = `${history.length} coleta(s)`;
+  if (!history.length) {
+    const empty = document.createElement('div');
+    empty.className = 'history-empty panel';
+    empty.textContent = 'Nenhuma coleta salva ainda.';
+    historyList.appendChild(empty);
+    return;
+  }
+
+  history.forEach((item) => {
+    const details = document.createElement('details');
+    details.className = 'history-dropdown panel';
+    const summary = document.createElement('summary');
+    const title = document.createElement('span');
+    title.className = 'history-dropdown__title';
+    title.textContent = item.identity || item.vendor_label || item.vendor || 'Dispositivo sem nome';
+    const meta = document.createElement('span');
+    meta.className = 'history-dropdown__meta';
+    meta.textContent = `${item.ip} · ${formatCollectedAt(item.collected_at)} · ${item.client_count || 0} cliente(s)`;
+    summary.append(title, meta);
+
+    const content = document.createElement('div');
+    content.className = 'history-dropdown__content';
+    const host = document.createElement('div');
+    host.className = 'history-host-grid';
+    [['IP', item.ip], ['Tipo', item.vendor_label || item.vendor], ['Nome', item.identity], ['Uptime', item.uptime], ['Clientes', item.client_count]].forEach(([label, value]) => {
+      const card = document.createElement('div');
+      card.className = 'history-host-detail';
+      const labelElement = document.createElement('span');
+      labelElement.textContent = label;
+      const valueElement = document.createElement('strong');
+      valueElement.textContent = value ?? '—';
+      card.append(labelElement, valueElement);
+      host.appendChild(card);
+    });
+    content.appendChild(host);
+
+    const clients = Array.isArray(item.clients) ? item.clients : [];
+    const clientsTitle = document.createElement('h3');
+    clientsTitle.textContent = 'Clientes encontrados';
+    content.appendChild(clientsTitle);
+    if (!clients.length) {
+      const emptyClients = document.createElement('p');
+      emptyClients.className = 'history-empty-text';
+      emptyClients.textContent = 'Nenhum cliente retornado nesta coleta.';
+      content.appendChild(emptyClients);
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = 'clients-table-wrap';
+      const table = document.createElement('table');
+      table.className = 'clients-table';
+      const head = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      ['Nome', 'MAC', 'Uptime', 'Tx/Rx Signal', 'CCQ'].forEach((label) => { const cell = document.createElement('th'); cell.textContent = label; headRow.appendChild(cell); });
+      head.appendChild(headRow);
+      const body = document.createElement('tbody');
+      clients.forEach((client) => {
+        const row = document.createElement('tr');
+        [client.radioName, client.mac, client.uptime, client.rxSignal ? `${client.txRxSignalStrength ?? '—'} / ${client.rxSignal}` : client.txRxSignalStrength, client.txRxCcq].forEach((value) => appendHistoryCell(row, value));
+        body.appendChild(row);
+      });
+      table.append(head, body);
+      wrap.appendChild(table);
+      content.appendChild(wrap);
+    }
+    details.append(summary, content);
+    historyList.appendChild(details);
+  });
+}
+
+async function loadHistory() {
+  if (!historyList || !historyBadge) return;
+  historyBadge.textContent = 'Carregando';
+  historyList.replaceChildren();
+  try {
+    const response = await fetch(apiUrl('/api/devices/history?limit=50'));
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.message || 'Não foi possível carregar o histórico.');
+    renderHistory(payload.history || []);
+  } catch (error) {
+    historyBadge.textContent = 'Indisponível';
+    const message = document.createElement('div');
+    message.className = 'history-empty panel';
+    message.textContent = error.message || 'Não foi possível carregar o histórico.';
+    historyList.appendChild(message);
+  }
 }
 
 function collectWithLiveLog(ip, vendor) {
@@ -146,6 +271,7 @@ async function verifyDevice() {
   tracertButton.disabled = true;
   setRadioDetails('n/a');
   scanStatus.textContent = 'Consultando dispositivo…';
+  setCollectionModal(true, 'Iniciando consulta…');
   const log = byId('collectionLog');
   if (log) log.replaceChildren();
   try {
@@ -159,6 +285,7 @@ async function verifyDevice() {
     scanStatus.textContent = error.message || 'Não foi possível consultar o dispositivo.';
   } finally {
     scanButton.disabled = false;
+    setCollectionModal(false);
   }
 }
 
@@ -173,6 +300,8 @@ function applyTheme(theme) {
 scanButton?.addEventListener('click', verifyDevice);
 pingButton?.addEventListener('click', () => runDiagnostic('ping'));
 tracertButton?.addEventListener('click', () => runDiagnostic('traceroute'));
+dashboardNav?.addEventListener('click', () => showView('dashboard'));
+historyNav?.addEventListener('click', () => showView('history'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');
