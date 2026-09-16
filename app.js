@@ -30,41 +30,22 @@ function setRadioDetails(value) {
   ['deviceSignalTx', 'deviceSignalRx', 'deviceCcq'].forEach((id) => setText(id, value));
 }
 
-function appendLine(container, values) {
-  const line = document.createElement('div');
-  line.className = 'monitor-line';
-  values.forEach(([className, text]) => {
-    const span = document.createElement('span');
-    span.className = className;
-    span.textContent = text;
-    line.appendChild(span);
-  });
-  container.appendChild(line);
+function renderCommandOutput(targetId, output, fallback) {
+  const target = byId(targetId);
+  if (!target) return;
+  target.replaceChildren();
+  const pre = document.createElement('pre');
+  pre.className = 'monitor-output';
+  pre.textContent = output || fallback;
+  target.appendChild(pre);
 }
 
 function renderPing(ping) {
-  const target = byId('pingValue');
-  if (!target) return;
-  target.replaceChildren();
-  const output = document.createElement('div');
-  output.className = 'monitor-output';
-  const packets = ping?.packets || { sent: 0, received: 0, loss: 100 };
-  appendLine(output, [['monitor-line__label', 'Ping'], ['monitor-line__value', `${packets.received}/${packets.sent} respostas`]]);
-  appendLine(output, [['monitor-line__label', 'Latência'], ['monitor-line__value', ping?.latency == null ? 'Não informada' : `${ping.latency} ms`]]);
-  appendLine(output, [['monitor-line__label', 'Perda'], ['monitor-line__value', `${packets.loss}%`]]);
-  target.appendChild(output);
+  renderCommandOutput('pingValue', ping?.output, 'Ping não retornou saída.');
 }
 
 function renderTraceroute(traceroute) {
-  const target = byId('tracertValue');
-  if (!target) return;
-  target.replaceChildren();
-  const output = document.createElement('div');
-  output.className = 'monitor-output';
-  const hops = traceroute?.hops || [];
-  if (!hops.length) appendLine(output, [['monitor-line__value', 'Sem rota disponível']]);
-  hops.forEach((hop) => appendLine(output, [['monitor-line__hop', String(hop.hop)], ['monitor-line__label', hop.route], ['monitor-line__value', hop.latency || 'Sem resposta']]));
-  target.appendChild(output);
+  renderCommandOutput('tracertValue', traceroute?.output, 'Tracert não retornou saída.');
 }
 
 function renderCollectionData({ device, clients }) {

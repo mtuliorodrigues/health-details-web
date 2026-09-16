@@ -4,38 +4,35 @@
 }
 
 :root {
-  --bg: #eef4f8;
-  --panel: #ffffff;
-  --panel-soft: #eef7f5;
-  --text: #102c2e;
-  --text-soft: #536b6d;
-  --text-light: #809090;
-  --muted: #738685;
-  --line: #dcebe7;
-  --green: #22b573;
-  --green-dark: #137a56;
-  --green-soft: #d8f8ed;
-  --blue: #61a0ff;
-  --blue-soft: #ddedf8;
-  --orange: #eba84e;
-  --orange-soft: #ffeedd;
-  --red: #df625e;
-  --red-soft: #ffdada;
-  --shadow: rgba(14, 50, 54, 0.12);
+  --bg: #03080f;
+  --panel: #091522;
+  --panel-soft: #0d1c2b;
+  --text: #edf5ff;
+  --text-soft: #a6b8cb;
+  --text-light: #6f8499;
+  --muted: #8297aa;
+  --line: #1d3448;
+  --green: #14d69a;
+  --green-dark: #0dbb84;
+  --green-soft: #083b35;
+  --blue: #22c6df;
+  --blue-soft: #082f3b;
+  --orange: #f2b94b;
+  --orange-soft: #3c2c0b;
+  --red: #ef6b73;
+  --red-soft: #3b1720;
+  --shadow: rgba(0, 0, 0, 0.34);
   --font: "Inter", "Segoe UI", Arial, sans-serif;
 }
 
 body {
   margin: 0;
   color: var(--text);
-  background: radial-gradient(circle at right top, #d6efe9, var(--bg));
+  background: radial-gradient(circle at 84% 0%, #0c2433 0%, var(--bg) 42%);
   font-family: var(--font);
 }
 
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-}
+.app-shell { min-height: 100vh; }
 
 .sidebar {
   width: 280px;
@@ -219,7 +216,7 @@ body {
 
 .icon-button {
   width: 44px;
-  background: white;
+  background: var(--panel);
   color: var(--text);
   border: 1px solid var(--line);
 }
@@ -867,3 +864,43 @@ body {
     box-shadow: 0 0 0 0 rgba(34, 181, 115, 0);
   }
 }
+
+/* Host Health Diagnostic: painel escuro de alto contraste. */
+.panel-health {
+  display: flex;
+  flex-direction: column;
+  min-height: 510px;
+  background: linear-gradient(180deg, #091522 0%, #07141e 100%);
+}
+
+.monitor-stack {
+  grid-template-rows: repeat(2, minmax(180px, 1fr));
+  flex: 1;
+}
+
+.monitor-window {
+  display: flex;
+  flex-direction: column;
+  background: #07111c;
+}
+
+.monitor-window__body {
+  flex: 1;
+  overflow: auto;
+}
+
+.monitor-output {
+  margin: 0;
+  color: #d7e6f5;
+  font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.device-detail,
+.device-icon {
+  background: #0a1724;
+}
+
+.collection-log { background: #050c14; color: #b7d9d6; }
+.clients-table th { background: #0d1c2b; }
+.panel { border-color: #193248; }
