@@ -9,8 +9,10 @@ const themeToggle = byId('themeToggle');
 const themeIcon = byId('themeIcon');
 const dashboardNav = byId('dashboardNav');
 const historyNav = byId('historyNav');
+const collectionLogNav = byId('collectionLogNav');
 const dashboardView = byId('dashboardView');
 const historyView = byId('historyView');
+const collectionLogView = byId('collectionLogView');
 const historyList = byId('historyList');
 const historyBadge = byId('historyBadge');
 const collectionModal = byId('collectionModal');
@@ -45,25 +47,45 @@ function setCollectionModal(visible, message = 'Preparando a coleta…') {
 
 function showView(view) {
   const showHistory = view === 'history';
-  if (dashboardView) dashboardView.hidden = showHistory;
+  const showCollectionLog = view === 'collection-log';
+  if (dashboardView) dashboardView.hidden = showHistory || showCollectionLog;
   if (historyView) historyView.hidden = !showHistory;
-  dashboardNav?.classList.toggle('active', !showHistory);
+  if (collectionLogView) collectionLogView.hidden = !showCollectionLog;
+  dashboardNav?.classList.toggle('active', !showHistory && !showCollectionLog);
   historyNav?.classList.toggle('active', showHistory);
+  collectionLogNav?.classList.toggle('active', showCollectionLog);
   if (showHistory) loadHistory();
 }
 
-function renderCommandOutput(targetId, output, fallback) {
-  const target = byId(targetId);
+function renderPing(ping) {
+  const target = byId('pingValue');
   if (!target) return;
   target.replaceChildren();
-  const pre = document.createElement('pre');
-  pre.className = 'monitor-output';
-  pre.textContent = output || fallback;
-  target.appendChild(pre);
-}
-
-function renderPing(ping) {
-  renderCommandOutput('pingValue', ping?.output, 'Ping não retornou saída.');
+  if (!ping) {
+    target.textContent = 'Ping não retornou dados.';
+    return;
+  }
+  const summary = document.createElement('div');
+  summary.className = 'ping-summary';
+  const status = document.createElement('strong');
+  status.className = `ping-summary__status ${ping.success ? 'is-online' : 'is-offline'}`;
+  status.textContent = ping.success ? 'Online' : 'Sem resposta';
+  summary.appendChild(status);
+  [
+    ['Pacotes recebidos', `${ping.packets?.received ?? 0} de ${ping.packets?.sent ?? 0}`],
+    ['Perda', `${ping.packets?.loss ?? 100}%`],
+    ['Latência média', ping.latency == null ? 'Indisponível' : `${ping.latency} ms`]
+  ].forEach(([label, value]) => {
+    const item = document.createElement('div');
+    item.className = 'ping-summary__item';
+    const itemLabel = document.createElement('span');
+    itemLabel.textContent = label;
+    const itemValue = document.createElement('strong');
+    itemValue.textContent = value;
+    item.append(itemLabel, itemValue);
+    summary.appendChild(item);
+  });
+  target.appendChild(summary);
 }
 
 function renderCollectionData({ device, clients }) {
@@ -319,6 +341,7 @@ scanButton?.addEventListener('click', verifyDevice);
 pingButton?.addEventListener('click', runPingDiagnostic);
 dashboardNav?.addEventListener('click', () => showView('dashboard'));
 historyNav?.addEventListener('click', () => showView('history'));
+collectionLogNav?.addEventListener('click', () => showView('collection-log'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');

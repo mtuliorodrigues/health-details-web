@@ -18,6 +18,7 @@
         <div class="nav-label">Menu</div>
         <button class="nav-link active" id="dashboardNav" type="button"><span class="nav-link__icon">⌂</span>Dashboard</button>
         <button class="nav-link" id="historyNav" type="button"><span class="nav-link__icon">◷</span>Histórico</button>
+        <button class="nav-link" id="collectionLogNav" type="button"><span class="nav-link__icon">≡</span>Log Coletas</button>
       </nav>
       <div class="sidebar-card">
         <div class="sidebar-card__label">Agente</div>
@@ -137,15 +138,6 @@
           </table>
         </div>
       </section>
-      <section class="panel collection-log-panel">
-        <section class="panel__header">
-          <div>
-            <span class="panel__kicker">Atividade da coleta</span>
-            <h2>Log em tempo real</h2>
-          </div>
-        </section>
-        <div class="collection-log" id="collectionLog" aria-live="polite"><div>Aguardando uma coleta.</div></div>
-      </section>
       </section>
 
       <section class="app-view" id="historyView" hidden>
@@ -158,6 +150,18 @@
           <span class="panel__badge" id="historyBadge">Carregando</span>
         </section>
         <section class="history-list" id="historyList" aria-live="polite"></section>
+      </section>
+      <section class="app-view" id="collectionLogView" hidden>
+        <section class="history-heading">
+          <div>
+            <span class="panel__kicker">Atividade da coleta</span>
+            <h2>Log de coletas</h2>
+            <p>Acompanhe as etapas executadas na última consulta.</p>
+          </div>
+        </section>
+        <section class="panel collection-log-panel">
+          <div class="collection-log" id="collectionLog" aria-live="polite"><div>Aguardando uma coleta.</div></div>
+        </section>
       </section>
     </main>
     <div class="collection-modal" id="collectionModal" role="dialog" aria-modal="true" aria-labelledby="collectionModalTitle" hidden>

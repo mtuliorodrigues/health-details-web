@@ -251,10 +251,10 @@ body {
 }
 
 .content-grid {
-  margin-top: 18px;
+  margin-top: 24px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.88fr);
-  gap: 18px;
+  gap: 24px;
 }
 
 .panel {
@@ -427,12 +427,12 @@ body {
 
 .clients-panel {
   grid-column: 1 / -1;
-  margin-top: 4px;
+  margin-top: 24px;
 }
 
 .collection-log-panel {
   grid-column: 1 / -1;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .collection-log {
@@ -511,7 +511,7 @@ body {
 
 .monitor-stack {
   display: grid;
-  gap: 14px;
+  gap: 20px;
   margin-top: 18px;
 }
 
@@ -892,12 +892,28 @@ body {
   overflow: auto;
 }
 
-.monitor-output {
-  margin: 0;
-  color: #d7e6f5;
-  font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  white-space: pre-wrap;
+.ping-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
 }
+
+.ping-summary__status {
+  grid-column: 1 / -1;
+  font-size: 16px;
+}
+
+.ping-summary__status.is-online { color: var(--green); }
+.ping-summary__status.is-offline { color: var(--red); }
+.ping-summary__item {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-soft);
+}
+.ping-summary__item span { display: block; color: var(--text-light); font-size: 11px; }
+.ping-summary__item strong { display: block; margin-top: 5px; color: var(--text); font-size: 15px; }
 
 .device-detail,
 .device-icon {
@@ -1058,4 +1074,6 @@ body {
   .navigation { display: flex; gap: 8px; margin: 0; flex-wrap: wrap; }
   .nav-label { display: none; }
   .nav-link { width: auto; margin: 0; padding: 10px; }
+  .ping-summary { grid-template-columns: 1fr; }
+  .ping-summary__status { grid-column: auto; }
 }
