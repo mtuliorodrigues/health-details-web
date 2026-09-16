@@ -132,6 +132,23 @@ function appendHistoryCell(row, value) {
   row.appendChild(cell);
 }
 
+async function deleteHistoryItem(id, button) {
+  if (!window.confirm('Excluir esta coleta do histórico? Esta ação não pode ser desfeita.')) return;
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Excluindo…';
+  try {
+    const response = await fetch(apiUrl(`/api/devices/history/${id}`), { method: 'DELETE' });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.message || 'Não foi possível excluir a coleta.');
+    await loadHistory();
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = originalText;
+    window.alert(error.message || 'Não foi possível excluir a coleta.');
+  }
+}
+
 function renderHistory(history = []) {
   if (!historyList || !historyBadge) return;
   historyList.replaceChildren();
@@ -158,6 +175,15 @@ function renderHistory(history = []) {
 
     const content = document.createElement('div');
     content.className = 'history-dropdown__content';
+    const actions = document.createElement('div');
+    actions.className = 'history-actions';
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'history-delete-button';
+    deleteButton.type = 'button';
+    deleteButton.textContent = 'Excluir coleta';
+    deleteButton.addEventListener('click', () => deleteHistoryItem(item.id, deleteButton));
+    actions.appendChild(deleteButton);
+    content.appendChild(actions);
     const host = document.createElement('div');
     host.className = 'history-host-grid';
     [['IP', item.ip], ['Tipo', item.vendor_label || item.vendor], ['Nome', item.identity], ['Uptime', item.uptime], ['Clientes', item.client_count]].forEach(([label, value]) => {

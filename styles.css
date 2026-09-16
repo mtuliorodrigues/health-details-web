@@ -54,12 +54,8 @@ body {
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: var(--green);
-  color: #062f2a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 30px rgba(34, 181, 115, 0.35);
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(20, 214, 154, .28));
 }
 
 .brand__icon svg {
@@ -967,6 +963,20 @@ body {
 .history-dropdown__meta { color: var(--text-soft); font-size: 13px; }
 .history-dropdown__content { padding: 22px; }
 .history-dropdown__content h3 { margin: 24px 0 0; font-size: 17px; }
+.history-actions { display: flex; justify-content: flex-end; }
+.history-delete-button {
+  border: 1px solid rgba(239, 107, 115, .5);
+  border-radius: 9px;
+  padding: 8px 11px;
+  background: var(--red-soft);
+  color: var(--red);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.history-delete-button:hover { background: rgba(239, 107, 115, .18); }
+.history-delete-button:disabled { cursor: wait; opacity: .65; }
 
 .history-host-grid {
   display: grid;
