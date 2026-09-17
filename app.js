@@ -17,7 +17,7 @@ const historyList = byId('historyList');
 const historyBadge = byId('historyBadge');
 const collectionModal = byId('collectionModal');
 const collectionModalStatus = byId('collectionModalStatus');
-const apiBaseUrl = window.HEALTH_DETAILS_API_URL?.replace(/\/$/, '') || '';
+const apiBaseUrl = '/api/relay';
 
 function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
