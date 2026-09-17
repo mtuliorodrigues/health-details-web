@@ -20,20 +20,6 @@
       <div class="status-text" id="accessStatus" aria-live="polite"></div>
     </form>
   </main>
-  <script>
-    const form = document.getElementById('accessForm');
-    const status = document.getElementById('accessStatus');
-    fetch('/api/auth/session', { cache: 'no-store' }).then((response) => response.json()).then((session) => {
-      if (!session.required || session.authenticated) window.location.replace('/');
-    }).catch(() => window.location.replace('/'));
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      status.textContent = 'Verificando…';
-      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: form.password.value }) });
-      const result = await response.json();
-      if (response.ok) window.location.replace('/');
-      else status.textContent = result.message || 'Não foi possível entrar.';
-    });
-  </script>
+  <script src="login.js"></script>
 </body>
 </html>

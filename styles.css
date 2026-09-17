@@ -935,6 +935,8 @@ body {
 .usage-steps { margin: 0; padding: 0 20px 0 36px; color: var(--text-soft); line-height: 1.65; }
 .usage-steps li + li { margin-top: 7px; }
 
+.app-shell[hidden],
+#logoutButton[hidden],
 .app-view[hidden],
 .collection-modal[hidden] { display: none; }
 

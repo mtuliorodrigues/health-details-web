@@ -24,14 +24,7 @@ function apiUrl(path) {
 }
 
 async function checkAccessSession() {
-  try {
-    const response = await fetch('/api/auth/session', { cache: 'no-store' });
-    const session = await response.json();
-    if (!response.ok || !session.required) return;
-    if (!session.authenticated) window.location.assign('/login.html');
-  } catch {
-    // Enquanto a autenticação estiver desativada, a indisponibilidade da rota não altera o painel atual.
-  }
+  return window.HealthAccess.check();
 }
 
 function isValidPrivateIp(ip) {
@@ -166,7 +159,8 @@ async function deleteHistoryItem(id, button) {
   button.disabled = true;
   button.textContent = 'Excluindo…';
   try {
-    const response = await fetch(apiUrl(`/api/devices/history/${id}`), { method: 'DELETE' });
+    if (!(await checkAccessSession())) return;
+    const response = await window.HealthAccess.request(apiUrl(`/api/devices/history/${id}`), { method: 'DELETE' });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.message || 'Não foi possível excluir a coleta.');
     await loadHistory();
@@ -264,7 +258,8 @@ async function loadHistory() {
   historyBadge.textContent = 'Carregando';
   historyList.replaceChildren();
   try {
-    const response = await fetch(apiUrl('/api/devices/history?limit=50'));
+    if (!(await checkAccessSession())) return;
+    const response = await window.HealthAccess.request(apiUrl('/api/devices/history?limit=50'));
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.message || 'Não foi possível carregar o histórico.');
     renderHistory(payload.history || []);
@@ -281,15 +276,27 @@ function collectWithLiveLog(ip, vendor) {
   return new Promise((resolve, reject) => {
     const source = new EventSource(apiUrl(`/api/devices/collect/stream?ip=${encodeURIComponent(ip)}&vendor=${encodeURIComponent(vendor)}`));
     let completed = false;
+    const close = () => {
+      source.close();
+      window.removeEventListener('health-session-ended', expired);
+    };
+    const expired = () => { completed = true; close(); reject(new Error('Sua sessão expirou. Entre novamente.')); };
+    window.addEventListener('health-session-ended', expired);
     source.addEventListener('log', (event) => appendCollectionLog(JSON.parse(event.data).message));
     source.addEventListener('result', (event) => {
       completed = true;
-      source.close();
+      close();
       resolve(JSON.parse(event.data));
     });
-    source.addEventListener('error', (event) => {
+    source.addEventListener('error', async (event) => {
       if (completed) return;
-      source.close();
+      completed = true;
+      close();
+      if (!event.data) {
+        try {
+          if (!(await checkAccessSession())) return reject(new Error('Sua sessão expirou. Entre novamente.'));
+        } catch { /* Preserve the original stream failure if session lookup is unavailable. */ }
+      }
       try { reject(new Error(JSON.parse(event.data).message)); } catch { reject(new Error('A conexão da coleta foi encerrada.')); }
     });
   });
@@ -302,10 +309,13 @@ async function runPingDiagnostic() {
   button.disabled = true;
   button.textContent = 'Consultando…';
   try {
-    const response = await fetch(apiUrl('/api/devices/diagnostics/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
+    if (!(await checkAccessSession())) return;
+    const response = await window.HealthAccess.request(apiUrl('/api/devices/diagnostics/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.message || 'Falha no diagnóstico.');
     renderPing(payload.ping);
+  } catch (error) {
+    setText('pingValue', error.message || 'Não foi possível executar o ping.');
   } finally {
     button.disabled = false;
     button.textContent = 'Executar ping';
@@ -327,6 +337,7 @@ async function verifyDevice() {
   const log = byId('collectionLog');
   if (log) log.replaceChildren();
   try {
+    if (!(await checkAccessSession())) return;
     const payload = await collectWithLiveLog(ip, vendorInput?.value || 'mikrotik');
     renderCollectionData(payload);
     pingButton.disabled = false;
@@ -356,4 +367,4 @@ collectionLogNav?.addEventListener('click', () => showView('collection-log'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');
-checkAccessSession();
+checkAccessSession().catch((error) => { scanStatus.textContent = error.message; });

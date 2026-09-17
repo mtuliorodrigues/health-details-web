@@ -8,6 +8,8 @@
     { "source": "/api/agent/:path*", "destination": "/api/proxy?__agentPath=:path*" }
   ],
   "headers": [
+    { "source": "/auth-client.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+    { "source": "/login.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
     { "source": "/app.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
     { "source": "/app-settings.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
   ]
