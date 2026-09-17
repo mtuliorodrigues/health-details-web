@@ -346,6 +346,13 @@ body {
   box-shadow: 0 0 0 3px rgba(34, 181, 115, 0.14);
 }
 
+.access-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.access-card { width: min(400px, 100%); display: grid; gap: 14px; padding: 32px; border: 1px solid #2b5d7c; border-radius: 22px; background: var(--panel); box-shadow: 0 20px 60px var(--shadow); }
+.access-card h1 { margin: 0; font-size: 30px; }
+.access-card p { margin: 0 0 6px; color: var(--text-soft); }
+.access-card label { color: var(--text-soft); font-size: 12px; font-weight: 700; }
+.access-card input { min-height: 48px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; color: var(--text); background: var(--panel-soft); font: inherit; }
+
 .input-row select:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgba(34, 181, 115, 0.14);

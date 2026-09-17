@@ -23,6 +23,17 @@ function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
 }
 
+async function checkAccessSession() {
+  try {
+    const response = await fetch('/api/auth/session', { cache: 'no-store' });
+    const session = await response.json();
+    if (!response.ok || !session.required) return;
+    if (!session.authenticated) window.location.assign('/login.html');
+  } catch {
+    // Enquanto a autenticação estiver desativada, a indisponibilidade da rota não altera o painel atual.
+  }
+}
+
 function isValidPrivateIp(ip) {
   const parts = ip.trim().split('.');
   if (parts.length !== 4 || !parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255)) return false;
@@ -345,3 +356,4 @@ collectionLogNav?.addEventListener('click', () => showView('collection-log'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');
+checkAccessSession();

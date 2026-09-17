@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso · Health Details</title>
+  <link rel="icon" type="image/png" href="assets/health-details-logo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="access-page">
+    <form class="access-card" id="accessForm">
+      <img class="brand__icon" src="assets/health-details-logo.png" alt="Health Details" />
+      <span class="panel__kicker">Acesso interno</span>
+      <h1>Health Details</h1>
+      <p>Informe a senha de acesso para continuar.</p>
+      <label for="accessPassword">Senha</label>
+      <input id="accessPassword" name="password" type="password" autocomplete="current-password" required />
+      <button class="primary-button" type="submit">Entrar</button>
+      <div class="status-text" id="accessStatus" aria-live="polite"></div>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('accessForm');
+    const status = document.getElementById('accessStatus');
+    fetch('/api/auth/session', { cache: 'no-store' }).then((response) => response.json()).then((session) => {
+      if (!session.required || session.authenticated) window.location.replace('/');
+    }).catch(() => window.location.replace('/'));
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      status.textContent = 'Verificando…';
+      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: form.password.value }) });
+      const result = await response.json();
+      if (response.ok) window.location.replace('/');
+      else status.textContent = result.message || 'Não foi possível entrar.';
+    });
+  </script>
+</body>
+</html>
