@@ -30,6 +30,7 @@ const apiBaseUrl = '/api/relay';
 const historyState = { page: 1, pageSize: 20, totalPages: 1, total: 0 };
 let lastCollection = null;
 let lastPing = null;
+let collectionLogBuffer = [];
 
 function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
@@ -227,13 +228,29 @@ function renderClients(clients = [], vendor) {
 }
 
 function appendCollectionLog(message) {
+  collectionLogBuffer.push(message);
+}
+
+function flushCollectionLog() {
   const log = byId('collectionLog');
   if (!log) return;
+  log.replaceChildren();
+  collectionLogBuffer.forEach((message) => {
+    const line = document.createElement('div');
+    line.textContent = `[${new Date().toLocaleTimeString('pt-BR')}] ${message}`;
+    log.appendChild(line);
+  });
+  log.scrollTop = log.scrollHeight;
+}
+
+function showFinalCollectionLog(message) {
+  const log = byId('collectionLog');
+  if (!log) return;
+  log.replaceChildren();
   const line = document.createElement('div');
   line.textContent = `[${new Date().toLocaleTimeString('pt-BR')}] ${message}`;
   log.appendChild(line);
   log.scrollTop = log.scrollHeight;
-  if (collectionModalStatus) collectionModalStatus.textContent = message;
 }
 
 function formatCollectedAt(value) {
@@ -445,18 +462,21 @@ async function verifyDevice() {
   pingButton.disabled = true;
   setRadioDetails('n/a');
   scanStatus.textContent = 'Consultando dispositivo…';
-  setCollectionModal(true, 'Iniciando consulta…');
+  setCollectionModal(true, 'Consultando dispositivo…');
   const log = byId('collectionLog');
   if (log) log.replaceChildren();
+  collectionLogBuffer = [];
   try {
     if (!(await checkAccessSession())) return;
     const payload = await collectWithLiveLog(ip, vendorInput?.value || 'mikrotik');
     renderCollectionData(payload);
+    flushCollectionLog();
     pingButton.disabled = false;
     scanStatus.textContent = `Consulta concluída às ${new Date(payload.device.collectedAt).toLocaleTimeString('pt-BR')}.`;
   } catch (error) {
     setRadioDetails('err');
     scanStatus.textContent = error.message || 'Não foi possível consultar o dispositivo.';
+    showFinalCollectionLog(scanStatus.textContent);
   } finally {
     scanButton.disabled = false;
     setCollectionModal(false);

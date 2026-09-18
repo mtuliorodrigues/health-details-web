@@ -21,11 +21,6 @@
         <button class="nav-link" id="collectionLogNav" type="button"><span class="nav-link__icon">≡</span>Log Coletas</button>
         <button class="nav-link" id="logoutButton" type="button" hidden><span class="nav-link__icon">↪</span>Sair</button>
       </nav>
-      <div class="sidebar-card">
-        <div class="sidebar-card__label">Agente</div>
-        <div class="sidebar-card__status" id="agentStatus" data-state="checking"><span class="pulse-dot"></span><span class="sidebar-card__text" id="agentStatusText">Verificando…</span></div>
-        <div class="sidebar-card__message" id="agentStatusMessage" role="status"></div>
-      </div>
     </aside>
     <main class="main">
       <section class="topbar">
@@ -33,6 +28,11 @@
           <h1>Host Health Diagnostic</h1>
         </div>
         <div class="topbar__right">
+          <div class="agent-status-card" aria-live="polite">
+            <div class="agent-status-card__label">Agente</div>
+            <div class="sidebar-card__status" id="agentStatus" data-state="checking"><span class="pulse-dot"></span><span class="sidebar-card__text" id="agentStatusText">Verificando…</span></div>
+            <div class="sidebar-card__message" id="agentStatusMessage" role="status"></div>
+          </div>
           <button class="icon-button theme-button" id="themeToggle" aria-label="Alternar tema" aria-pressed="false">
             <span class="theme-icon" id="themeIcon">🌙</span>
           </button>
@@ -150,7 +150,7 @@
         <section class="panel__header">
           <div>
             <span class="panel__kicker">Clientes conectados</span>
-            <h2>Dados de rádio</h2>
+            <h2>Clientes conectados</h2>
           </div>
           <span class="panel__badge" id="clientsBadge">0 cliente(s)</span>
         </section>

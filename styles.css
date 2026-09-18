@@ -202,7 +202,21 @@ body {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
+
+.agent-status-card {
+  min-width: 170px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 8px 22px var(--shadow);
+}
+.agent-status-card__label { color: var(--text-light); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.agent-status-card .sidebar-card__status { margin-top: 7px; }
+.agent-status-card .sidebar-card__message { max-width: 210px; }
 
 .icon-button,
 .primary-button,
@@ -1118,4 +1132,7 @@ body {
   .health-summary-grid { grid-template-columns: 1fr 1fr; }
   .health-summary-client { display: grid; }
   .health-summary-client span { text-align: left; }
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .topbar__right { width: 100%; justify-content: space-between; }
+  .agent-status-card { flex: 1; min-width: 0; }
 }
