@@ -23,7 +23,8 @@
       </nav>
       <div class="sidebar-card">
         <div class="sidebar-card__label">Agente</div>
-        <div class="sidebar-card__status"><span class="pulse-dot"></span><span class="sidebar-card__text">Online</span></div>
+        <div class="sidebar-card__status" id="agentStatus" data-state="checking"><span class="pulse-dot"></span><span class="sidebar-card__text" id="agentStatusText">Verificando…</span></div>
+        <div class="sidebar-card__message" id="agentStatusMessage" role="status"></div>
       </div>
     </aside>
     <main class="main">
@@ -150,7 +151,22 @@
           </div>
           <span class="panel__badge" id="historyBadge">Carregando</span>
         </section>
+        <section class="panel history-filters" aria-label="Filtros do histórico">
+          <div class="history-filter-grid">
+            <label>IP<input id="historyIpFilter" type="search" placeholder="Ex.: 172.16.0.1" /></label>
+            <label>Equipamento<select id="historyVendorFilter"><option value="">Todos</option><option value="mikrotik">MikroTik</option><option value="ubiquiti-ac">Ubiquiti 5AC</option><option value="ubiquiti-m5">Ubiquiti M5</option></select></label>
+            <label>De<input id="historyFromFilter" type="date" /></label>
+            <label>Até<input id="historyToFilter" type="date" /></label>
+            <label>Resultado<select id="historyStatusFilter"><option value="">Todos</option><option value="success">Sucesso</option><option value="error">Falha</option></select></label>
+            <button class="secondary-button" id="historyFilterButton" type="button">Filtrar</button>
+          </div>
+        </section>
         <section class="history-list" id="historyList" aria-live="polite"></section>
+        <div class="history-pagination" id="historyPagination" hidden>
+          <button class="secondary-button" id="historyPrevious" type="button">Anterior</button>
+          <span id="historyPageInfo">Página 1</span>
+          <button class="secondary-button" id="historyNext" type="button">Próxima</button>
+        </div>
       </section>
       <section class="app-view" id="collectionLogView" hidden>
         <section class="history-heading">

@@ -17,7 +17,16 @@ const historyList = byId('historyList');
 const historyBadge = byId('historyBadge');
 const collectionModal = byId('collectionModal');
 const collectionModalStatus = byId('collectionModalStatus');
+const agentStatus = byId('agentStatus');
+const agentStatusText = byId('agentStatusText');
+const agentStatusMessage = byId('agentStatusMessage');
+const historyPagination = byId('historyPagination');
+const historyPrevious = byId('historyPrevious');
+const historyNext = byId('historyNext');
+const historyPageInfo = byId('historyPageInfo');
+const historyFilterButton = byId('historyFilterButton');
 const apiBaseUrl = '/api/relay';
+const historyState = { page: 1, pageSize: 20, totalPages: 1, total: 0 };
 
 function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
@@ -25,6 +34,26 @@ function apiUrl(path) {
 
 async function checkAccessSession() {
   return window.HealthAccess.check();
+}
+
+async function checkAgentStatus() {
+  if (!agentStatusText) return;
+  agentStatus?.setAttribute('data-state', 'checking');
+  agentStatusText.textContent = 'Verificando…';
+  if (agentStatusMessage) agentStatusMessage.textContent = '';
+  try {
+    if (!(await checkAccessSession())) return;
+    const response = await window.HealthAccess.request(apiUrl('/health'));
+    if (!response.ok) throw new Error('O agente não respondeu normalmente.');
+    const payload = await response.json();
+    if (payload.status !== 'ok') throw new Error('O agente está indisponível.');
+    agentStatus?.setAttribute('data-state', 'online');
+    agentStatusText.textContent = 'Online';
+  } catch {
+    agentStatus?.setAttribute('data-state', 'offline');
+    agentStatusText.textContent = 'Offline';
+    if (agentStatusMessage) agentStatusMessage.textContent = 'Não foi possível comunicar com o agente. Verifique se ele está iniciado.';
+  }
 }
 
 function isValidPrivateIp(ip) {
@@ -171,10 +200,10 @@ async function deleteHistoryItem(id, button) {
   }
 }
 
-function renderHistory(history = []) {
+function renderHistory(history = [], meta = {}) {
   if (!historyList || !historyBadge) return;
   historyList.replaceChildren();
-  historyBadge.textContent = `${history.length} coleta(s)`;
+  historyBadge.textContent = `${meta.total ?? history.length} coleta(s)`;
   if (!history.length) {
     const empty = document.createElement('div');
     empty.className = 'history-empty panel';
@@ -259,10 +288,19 @@ async function loadHistory() {
   historyList.replaceChildren();
   try {
     if (!(await checkAccessSession())) return;
-    const response = await window.HealthAccess.request(apiUrl('/api/devices/history?limit=50'));
+    const params = new URLSearchParams({ limit: String(historyState.pageSize), page: String(historyState.page) });
+    [['ip', 'historyIpFilter'], ['vendor', 'historyVendorFilter'], ['from', 'historyFromFilter'], ['to', 'historyToFilter'], ['status', 'historyStatusFilter']].forEach(([key, id]) => { const value = byId(id)?.value; if (value) params.set(key, value); });
+    const response = await window.HealthAccess.request(apiUrl(`/api/devices/history?${params}`));
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.message || 'Não foi possível carregar o histórico.');
-    renderHistory(payload.history || []);
+    historyState.total = payload.total ?? payload.history?.length ?? 0;
+    historyState.totalPages = Math.max(payload.totalPages || 1, 1);
+    historyState.page = payload.page || historyState.page;
+    renderHistory(payload.history || [], payload);
+    if (historyPagination) historyPagination.hidden = historyState.totalPages <= 1;
+    if (historyPageInfo) historyPageInfo.textContent = `Página ${historyState.page} de ${historyState.totalPages}`;
+    if (historyPrevious) historyPrevious.disabled = historyState.page <= 1;
+    if (historyNext) historyNext.disabled = historyState.page >= historyState.totalPages;
   } catch (error) {
     historyBadge.textContent = 'Indisponível';
     const message = document.createElement('div');
@@ -366,5 +404,9 @@ historyNav?.addEventListener('click', () => showView('history'));
 collectionLogNav?.addEventListener('click', () => showView('collection-log'));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
+historyFilterButton?.addEventListener('click', () => { historyState.page = 1; loadHistory(); });
+historyPrevious?.addEventListener('click', () => { if (historyState.page > 1) { historyState.page -= 1; loadHistory(); } });
+historyNext?.addEventListener('click', () => { if (historyState.page < historyState.totalPages) { historyState.page += 1; loadHistory(); } });
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');
-checkAccessSession().catch((error) => { scanStatus.textContent = error.message; });
+checkAccessSession().then(() => checkAgentStatus()).catch((error) => { scanStatus.textContent = error.message; });
+window.setInterval(checkAgentStatus, 60_000);
