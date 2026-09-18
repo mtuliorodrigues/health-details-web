@@ -976,6 +976,19 @@ body {
 .secondary-button:hover { border-color: var(--green); }
 .secondary-button:disabled { cursor: not-allowed; opacity: .45; }
 .history-pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin: 22px 0 8px; color: var(--text-soft); font-size: 13px; }
+.health-summary-panel { margin: 18px 0; }
+.health-summary-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.health-summary-item { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-soft); }
+.health-summary-item span { display: block; color: var(--text-light); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.health-summary-item strong { display: block; margin-top: 7px; overflow-wrap: anywhere; }
+.health-summary-clients { margin-top: 18px; }
+.health-summary-clients h3 { margin: 0 0 10px; font-size: 16px; }
+.health-summary-clients p, .health-summary-time { color: var(--text-soft); }
+.health-summary-client-list { display: grid; gap: 8px; }
+.health-summary-client { display: flex; justify-content: space-between; gap: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-soft); }
+.health-summary-client span { color: var(--text-soft); text-align: right; }
+.health-summary-time { margin-top: 14px; font-size: 12px; }
+.history-failure-message { margin: 18px 0 0; padding: 12px; border-left: 3px solid var(--red); background: var(--red-soft); color: var(--red); }
 
 .history-dropdown {
   padding: 0;
@@ -1085,6 +1098,7 @@ body {
 @media (max-width: 960px) {
   .history-host-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .history-filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .health-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .sidebar { padding: 20px 22px; gap: 18px; }
   .sidebar-card { margin-top: 0; }
 }
@@ -1101,4 +1115,7 @@ body {
   .ping-summary { grid-template-columns: 1fr; }
   .ping-summary__status { grid-column: auto; }
   .history-filter-grid { grid-template-columns: 1fr; }
+  .health-summary-grid { grid-template-columns: 1fr 1fr; }
+  .health-summary-client { display: grid; }
+  .health-summary-client span { text-align: left; }
 }

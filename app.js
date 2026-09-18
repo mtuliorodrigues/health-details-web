@@ -25,8 +25,11 @@ const historyPrevious = byId('historyPrevious');
 const historyNext = byId('historyNext');
 const historyPageInfo = byId('historyPageInfo');
 const historyFilterButton = byId('historyFilterButton');
+const healthSummary = byId('healthSummary');
 const apiBaseUrl = '/api/relay';
 const historyState = { page: 1, pageSize: 20, totalPages: 1, total: 0 };
+let lastCollection = null;
+let lastPing = null;
 
 function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
@@ -119,15 +122,76 @@ function renderPing(ping) {
     summary.appendChild(item);
   });
   target.appendChild(summary);
+  lastPing = ping;
+  renderHealthSummary();
+}
+
+function summaryText(id, value) { const element = byId(id); if (element) element.textContent = value ?? '—'; }
+
+function renderHealthSummary() {
+  if (!healthSummary || !lastCollection?.device) return;
+  const { device, clients = [] } = lastCollection;
+  healthSummary.hidden = false;
+  const status = byId('healthSummaryStatus');
+  const pingOk = lastPing?.success === true;
+  const pingFailed = lastPing && !lastPing.success;
+  const label = pingOk ? 'Conectado' : pingFailed ? 'Ping sem resposta' : 'Coleta concluída';
+  if (status) { status.textContent = label; status.className = `panel__badge ${pingOk ? 'success' : pingFailed ? 'danger' : 'warning'}`; }
+  summaryText('healthSummaryDevice', device.identity || 'Nome indisponível');
+  summaryText('healthSummaryHost', `${device.ip} · ${device.vendorLabel || device.vendor}`);
+  summaryText('healthSummaryUptime', device.uptime || 'Indisponível');
+  summaryText('healthSummaryPing', !lastPing ? 'Ainda não executado' : pingOk ? `Online · ${lastPing.latency == null ? 'latência indisponível' : `${lastPing.latency} ms`}` : 'Sem resposta');
+  summaryText('healthSummaryLoss', !lastPing ? 'Ainda não executado' : `${lastPing.packets?.loss ?? 100}%`);
+  summaryText('healthSummaryClients', `${clients.length}`);
+  const time = byId('healthSummaryTime');
+  if (time) time.textContent = `Coleta concluída em ${formatCollectedAt(device.collectedAt)}.`;
+  const metrics = byId('healthSummaryClientMetrics');
+  if (!metrics) return;
+  metrics.replaceChildren();
+  const title = document.createElement('h3');
+  title.textContent = 'Principais métricas dos clientes';
+  metrics.appendChild(title);
+  if (!clients.length) { const empty = document.createElement('p'); empty.textContent = 'Nenhum cliente conectado foi encontrado.'; metrics.appendChild(empty); return; }
+  const list = document.createElement('div');
+  list.className = 'health-summary-client-list';
+  clients.slice(0, 8).forEach((client) => {
+    const item = document.createElement('div');
+    item.className = 'health-summary-client';
+    const name = document.createElement('strong');
+    name.textContent = client.radioName || 'Cliente sem nome';
+    const details = document.createElement('span');
+    const values = [];
+    if (device.vendor === 'ubiquiti-m5') {
+      if (client.txRxSignalStrength) values.push(`Tx ${client.txRxSignalStrength}`);
+      if (client.rxSignal) values.push(`Rx ${client.rxSignal}`);
+      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    } else if (device.vendor === 'ubiquiti-ac') {
+      if (client.txRxSignalStrength) values.push(`Signal ${client.txRxSignalStrength}`);
+      if (client.txRxCcq) values.push(`Remote Signal ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    } else {
+      if (client.mac) values.push(`MAC ${client.mac}`);
+      if (client.txRxSignalStrength) values.push(`Sinal ${client.txRxSignalStrength}`);
+      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    }
+    details.textContent = values.length ? values.join(' · ') : 'Métricas indisponíveis';
+    item.append(name, details); list.appendChild(item);
+  });
+  metrics.appendChild(list);
 }
 
 function renderCollectionData({ device, clients }) {
+  lastCollection = { device, clients: clients || [] };
+  lastPing = null;
   const clientCount = clients?.length || 0;
   setText('deviceSignalTx', device.identity || device.vendorLabel);
   setText('deviceSignalRx', device.uptime);
   setText('deviceCcq', String(clientCount));
   setText('detectedDevice', `— ${device.vendorLabel}`);
   renderClients(clients, device.vendor);
+  renderHealthSummary();
   if (healthBadge) {
     healthBadge.textContent = clientCount ? `${clientCount} cliente(s)` : 'Sem clientes';
     healthBadge.className = 'panel__badge';
@@ -218,10 +282,11 @@ function renderHistory(history = [], meta = {}) {
     const summary = document.createElement('summary');
     const title = document.createElement('span');
     title.className = 'history-dropdown__title';
-    title.textContent = item.identity || item.vendor_label || item.vendor || 'Dispositivo sem nome';
+    const isFailure = item.status === 'failure' || item.status === 'error';
+    title.textContent = `${isFailure ? '[Falha] ' : ''}${item.identity || item.vendor_label || item.vendor || 'Dispositivo sem nome'}`;
     const meta = document.createElement('span');
     meta.className = 'history-dropdown__meta';
-    meta.textContent = `${item.ip} · ${formatCollectedAt(item.collected_at)} · ${item.client_count || 0} cliente(s)`;
+    meta.textContent = `${item.ip} · ${formatCollectedAt(item.collected_at)} · ${isFailure ? 'Falha' : `${item.client_count || 0} cliente(s)`}`;
     summary.append(title, meta);
 
     const content = document.createElement('div');
@@ -236,7 +301,7 @@ function renderHistory(history = [], meta = {}) {
     actions.appendChild(deleteButton);
     const host = document.createElement('div');
     host.className = 'history-host-grid';
-    [['IP', item.ip], ['Tipo', item.vendor_label || item.vendor], ['Nome', item.identity], ['Uptime', item.uptime], ['Clientes', item.client_count]].forEach(([label, value]) => {
+    [['IP', item.ip], ['Tipo', item.vendor_label || item.vendor], ['Nome', item.identity], ['Uptime', item.uptime], ['Resultado', isFailure ? 'Falha' : 'Sucesso'], ['Clientes', item.client_count]].forEach(([label, value]) => {
       const card = document.createElement('div');
       card.className = 'history-host-detail';
       const labelElement = document.createElement('span');
@@ -247,6 +312,13 @@ function renderHistory(history = [], meta = {}) {
       host.appendChild(card);
     });
     content.appendChild(host);
+
+    if (isFailure) {
+      const errorText = document.createElement('p');
+      errorText.className = 'history-failure-message';
+      errorText.textContent = item.error_message || 'Falha durante a coleta.';
+      content.appendChild(errorText);
+    }
 
     const clients = Array.isArray(item.clients) ? item.clients : [];
     const clientsTitle = document.createElement('h3');
@@ -353,6 +425,8 @@ async function runPingDiagnostic() {
     if (!response.ok) throw new Error(payload.message || 'Falha no diagnóstico.');
     renderPing(payload.ping);
   } catch (error) {
+    lastPing = { success: false, packets: { loss: 100 } };
+    renderHealthSummary();
     setText('pingValue', error.message || 'Não foi possível executar o ping.');
   } finally {
     button.disabled = false;

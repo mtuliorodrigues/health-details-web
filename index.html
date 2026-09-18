@@ -123,6 +123,27 @@
             </section>
           </section>
         </section>
+
+      </section>
+
+      <section class="panel health-summary-panel" id="healthSummary" hidden>
+        <section class="panel__header">
+          <div>
+            <span class="panel__kicker">Resumo visual</span>
+            <h2>Saúde da conexão</h2>
+          </div>
+          <span class="panel__badge" id="healthSummaryStatus">Aguardando coleta</span>
+        </section>
+        <div class="health-summary-grid">
+          <div class="health-summary-item"><span>Equipamento</span><strong id="healthSummaryDevice">—</strong></div>
+          <div class="health-summary-item"><span>IP / Vendor</span><strong id="healthSummaryHost">—</strong></div>
+          <div class="health-summary-item"><span>Uptime</span><strong id="healthSummaryUptime">—</strong></div>
+          <div class="health-summary-item"><span>Ping / latência</span><strong id="healthSummaryPing">Ainda não executado</strong></div>
+          <div class="health-summary-item"><span>Perda de pacotes</span><strong id="healthSummaryLoss">Ainda não executado</strong></div>
+          <div class="health-summary-item"><span>Clientes conectados</span><strong id="healthSummaryClients">—</strong></div>
+        </div>
+        <div class="health-summary-clients" id="healthSummaryClientMetrics"></div>
+        <div class="health-summary-time" id="healthSummaryTime"></div>
       </section>
 
       <section class="panel clients-panel">
