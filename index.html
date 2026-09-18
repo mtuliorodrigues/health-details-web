@@ -12,7 +12,7 @@
     <aside class="sidebar" aria-label="Navegação principal">
       <div class="brand">
         <img class="brand__icon" src="assets/health-details-logo.png" alt="Health Details" />
-        <span class="brand__text">Health Details</span>
+        <span class="brand__text">Host Details</span>
       </div>
       <nav class="navigation">
         <div class="nav-label">Menu</div>
@@ -21,18 +21,19 @@
         <button class="nav-link" id="collectionLogNav" type="button"><span class="nav-link__icon">≡</span>Log Coletas</button>
         <button class="nav-link" id="logoutButton" type="button" hidden><span class="nav-link__icon">↪</span>Sair</button>
       </nav>
+      <div class="sidebar-card">
+        <div class="sidebar-card__label">Agente</div>
+        <div class="sidebar-card__status" id="agentStatus" data-state="checking"><span class="pulse-dot"></span><span class="sidebar-card__text" id="agentStatusText">Verificando…</span></div>
+        <div class="sidebar-card__message" id="agentStatusMessage" role="status"></div>
+      </div>
     </aside>
     <main class="main">
       <section class="topbar">
         <div class="topbar__left">
-          <h1>Host Health Diagnostic</h1>
+          <span class="topbar__kicker" id="sectionKicker">Diagnóstico</span>
+          <h1 id="sectionTitle">Host Health Diagnostic</h1>
         </div>
         <div class="topbar__right">
-          <div class="agent-status-card" aria-live="polite">
-            <div class="agent-status-card__label">Agente</div>
-            <div class="sidebar-card__status" id="agentStatus" data-state="checking"><span class="pulse-dot"></span><span class="sidebar-card__text" id="agentStatusText">Verificando…</span></div>
-            <div class="sidebar-card__message" id="agentStatusMessage" role="status"></div>
-          </div>
           <button class="icon-button theme-button" id="themeToggle" aria-label="Alternar tema" aria-pressed="false">
             <span class="theme-icon" id="themeIcon">🌙</span>
           </button>
@@ -42,49 +43,17 @@
       <section class="app-view" id="dashboardView">
       <section class="content-grid">
         <section class="panel panel-form">
-          <div class="verification">
-            <div class="control-label">IP do dispositivo</div>
+          <div class="verification consultation-card">
+            <div class="radio-antenna" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="consultation-label">MikroTik <span>•</span> Ubiquiti</div>
             <div class="input-row">
-              <input type="text" id="ipInput" value="192.168.10.24" autocomplete="off" />
-              <select id="vendorInput" aria-label="Tipo do dispositivo">
-                <option value="auto">Detectar automaticamente</option>
-                <option value="mikrotik">MikroTik</option>
-                <option value="ubiquiti-ac">Ubiquiti AC</option>
-                <option value="ubiquiti-m5">Ubiquiti M5</option>
-              </select>
+              <input type="text" id="ipInput" placeholder="Digite o IP" autocomplete="off" aria-label="IP do dispositivo" />
+              <input type="hidden" id="vendorInput" value="auto" />
               <button class="primary-button" id="scanButton">
                 <span>Coletar</span>
               </button>
             </div>
-            <div class="status-text" id="scanStatus">Pronto para consultar</div>
-          </div>
-
-          <section class="device-profile">
-            <div class="device-profile__header">
-              <div>
-                <span class="panel__kicker">Informações do host <span id="detectedDevice">— aguardando detecção</span></span>
-              </div>
-              <span class="device-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="2" />
-                  <path d="M8 18h8" fill="none" stroke="currentColor" stroke-width="2" />
-                </svg>
-              </span>
-            </div>
-            <div class="device-grid">
-              <div class="device-detail">
-                <span class="device-detail__label">Nome do dispositivo</span>
-                <span class="device-detail__value" id="deviceSignalTx">n/a</span>
-              </div>
-              <div class="device-detail">
-                <span class="device-detail__label">Uptime do dispositivo</span>
-                <span class="device-detail__value" id="deviceSignalRx">n/a</span>
-              </div>
-              <div class="device-detail">
-                <span class="device-detail__label">Clientes conectados</span>
-                <span class="device-detail__value" id="deviceCcq">n/a</span>
-              </div>
-            </div>
+            <div class="status-text" id="scanStatus" aria-live="polite"></div>
           </section>
         </section>
 
@@ -104,29 +73,19 @@
                 <button class="monitor-action" id="pingButton" disabled>Executar ping</button>
               </div>
               <div class="monitor-window__body">
-                <div class="monitor-window__text" id="pingValue">Disponível após a coleta de clientes.</div>
+                <div class="monitor-window__text ping-terminal" id="pingValue">Disponível após a coleta.</div>
               </div>
             </section>
-
-            <section class="monitor-window usage-window" aria-labelledby="usageTitle">
-              <div class="monitor-window__header">
-                <span class="monitor-window__title" id="usageTitle">Como usar</span>
-              </div>
-              <div class="monitor-window__body">
-                <ol class="usage-steps">
-                  <li>Informe o IP privado do equipamento.</li>
-                  <li>Deixe em “Detectar automaticamente” ou escolha o modelo.</li>
-                  <li>Clique em “Coletar” e aguarde a conclusão.</li>
-                  <li>Use o ping e consulte as coletas anteriores em Histórico.</li>
-                </ol>
-              </div>
-            </section>
+            <div class="help-tchum" tabindex="0" aria-label="Como usar">
+              <span class="help-tchum__trigger">?</span>
+              <div class="help-tchum__card"><strong>Como usar</strong><span>Digite um IP privado e clique em Coletar. Depois consulte o ping e o resumo da conexão.</span></div>
+            </div>
           </section>
         </section>
 
       </section>
 
-      <section class="panel health-summary-panel" id="healthSummary" hidden>
+      <section class="panel health-summary-panel" id="healthSummary">
         <section class="panel__header">
           <div>
             <span class="panel__kicker">Resumo visual</span>
@@ -142,7 +101,7 @@
           <div class="health-summary-item"><span>Perda de pacotes</span><strong id="healthSummaryLoss">Ainda não executado</strong></div>
           <div class="health-summary-item"><span>Clientes conectados</span><strong id="healthSummaryClients">—</strong></div>
         </div>
-        <div class="health-summary-clients" id="healthSummaryClientMetrics"></div>
+        <div class="health-summary-clients" id="healthSummaryClientMetrics"><p class="health-summary-empty">Aguardando uma coleta para exibir os clientes e suas métricas.</p></div>
         <div class="health-summary-time" id="healthSummaryTime"></div>
       </section>
 
@@ -168,7 +127,6 @@
           <div>
             <span class="panel__kicker">Coletas salvas</span>
             <h2>Histórico</h2>
-            <p>Abra uma coleta para consultar o resumo do host e os clientes encontrados.</p>
           </div>
           <span class="panel__badge" id="historyBadge">Carregando</span>
         </section>
@@ -194,7 +152,6 @@
           <div>
             <span class="panel__kicker">Atividade da coleta</span>
             <h2>Log de coletas</h2>
-            <p>Acompanhe as etapas executadas na última consulta.</p>
           </div>
         </section>
         <section class="panel collection-log-panel">
@@ -206,7 +163,7 @@
       <div class="collection-modal__card">
         <span class="collection-spinner" aria-hidden="true"></span>
         <h2 id="collectionModalTitle">Consultando dispositivo</h2>
-        <p id="collectionModalStatus">Preparando a coleta…</p>
+        <p id="collectionModalStatus">Aguarde…</p>
       </div>
     </div>
   </div>

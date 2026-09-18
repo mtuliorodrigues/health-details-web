@@ -76,7 +76,7 @@ function setRadioDetails(value) {
   ['deviceSignalTx', 'deviceSignalRx', 'deviceCcq'].forEach((id) => setText(id, value));
 }
 
-function setCollectionModal(visible, message = 'Preparando a coleta…') {
+function setCollectionModal(visible, message = 'Aguarde…') {
   if (!collectionModal) return;
   collectionModal.hidden = !visible;
   if (collectionModalStatus) collectionModalStatus.textContent = message;
@@ -91,6 +91,21 @@ function showView(view) {
   dashboardNav?.classList.toggle('active', !showHistory && !showCollectionLog);
   historyNav?.classList.toggle('active', showHistory);
   collectionLogNav?.classList.toggle('active', showCollectionLog);
+  const titles = {
+    dashboard: ['Diagnóstico', 'Host Health Diagnostic'],
+    history: ['Registros', 'Histórico'],
+    'collection-log': ['Atividade', 'Log de Coletas']
+  };
+  const [kicker, title] = titles[view] || titles.dashboard;
+  const titleElement = byId('sectionTitle');
+  const kickerElement = byId('sectionKicker');
+  if (titleElement) {
+    titleElement.classList.remove('tchum-title');
+    void titleElement.offsetWidth;
+    titleElement.textContent = title;
+    titleElement.classList.add('tchum-title');
+  }
+  if (kickerElement) kickerElement.textContent = kicker;
   if (showHistory) loadHistory();
 }
 
@@ -102,27 +117,13 @@ function renderPing(ping) {
     target.textContent = 'Ping não retornou dados.';
     return;
   }
-  const summary = document.createElement('div');
-  summary.className = 'ping-summary';
-  const status = document.createElement('strong');
-  status.className = `ping-summary__status ${ping.success ? 'is-online' : 'is-offline'}`;
-  status.textContent = ping.success ? 'Online' : 'Sem resposta';
-  summary.appendChild(status);
-  [
-    ['Pacotes recebidos', `${ping.packets?.received ?? 0} de ${ping.packets?.sent ?? 0}`],
-    ['Perda', `${ping.packets?.loss ?? 100}%`],
-    ['Latência média', ping.latency == null ? 'Indisponível' : `${ping.latency} ms`]
-  ].forEach(([label, value]) => {
-    const item = document.createElement('div');
-    item.className = 'ping-summary__item';
-    const itemLabel = document.createElement('span');
-    itemLabel.textContent = label;
-    const itemValue = document.createElement('strong');
-    itemValue.textContent = value;
-    item.append(itemLabel, itemValue);
-    summary.appendChild(item);
-  });
-  target.appendChild(summary);
+  const sent = ping.packets?.sent ?? 0;
+  const received = ping.packets?.received ?? 0;
+  const loss = ping.packets?.loss ?? 100;
+  const line = (text, className = 'ping-line') => { const element = document.createElement('span'); element.className = className; element.textContent = text; target.appendChild(element); };
+  line(`Ping: ${ping.success ? 'Online' : 'Sem resposta'}`);
+  for (let index = 0; index < 4; index += 1) line(`Resposta ${index + 1}: ${index < received ? 'recebida' : 'sem resposta'}`);
+  line(`Estatísticas: enviados=${sent} · recebidos=${received} · perdidos=${loss}% · latência média=${ping.latency == null ? 'indisponível' : `${ping.latency} ms`}`, 'ping-summary-line');
   lastPing = ping;
   renderHealthSummary();
 }
@@ -153,34 +154,22 @@ function renderHealthSummary() {
   title.textContent = 'Principais métricas dos clientes';
   metrics.appendChild(title);
   if (!clients.length) { const empty = document.createElement('p'); empty.textContent = 'Nenhum cliente conectado foi encontrado.'; metrics.appendChild(empty); return; }
-  const list = document.createElement('div');
-  list.className = 'health-summary-client-list';
+  const table = document.createElement('table');
+  table.className = 'health-summary-client-table';
+  const head = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  const headers = device.vendor === 'ubiquiti-m5' ? ['Nome', 'Conexão', 'Tx Signal', 'Rx Signal', 'CCQ'] : device.vendor === 'ubiquiti-ac' ? ['Nome', 'Conexão', 'Signal', 'Remote Signal'] : ['Nome', 'MAC', 'Conexão', 'Sinal', 'CCQ'];
+  headers.forEach((label) => { const cell = document.createElement('th'); cell.textContent = label; headRow.appendChild(cell); });
+  head.appendChild(headRow);
+  const body = document.createElement('tbody');
   clients.slice(0, 8).forEach((client) => {
-    const item = document.createElement('div');
-    item.className = 'health-summary-client';
-    const name = document.createElement('strong');
-    name.textContent = client.radioName || 'Cliente sem nome';
-    const details = document.createElement('span');
-    const values = [];
-    if (device.vendor === 'ubiquiti-m5') {
-      if (client.txRxSignalStrength) values.push(`Tx ${client.txRxSignalStrength}`);
-      if (client.rxSignal) values.push(`Rx ${client.rxSignal}`);
-      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
-      if (client.uptime) values.push(`Conexão ${client.uptime}`);
-    } else if (device.vendor === 'ubiquiti-ac') {
-      if (client.txRxSignalStrength) values.push(`Signal ${client.txRxSignalStrength}`);
-      if (client.txRxCcq) values.push(`Remote Signal ${client.txRxCcq}`);
-      if (client.uptime) values.push(`Conexão ${client.uptime}`);
-    } else {
-      if (client.mac) values.push(`MAC ${client.mac}`);
-      if (client.txRxSignalStrength) values.push(`Sinal ${client.txRxSignalStrength}`);
-      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
-      if (client.uptime) values.push(`Conexão ${client.uptime}`);
-    }
-    details.textContent = values.length ? values.join(' · ') : 'Métricas indisponíveis';
-    item.append(name, details); list.appendChild(item);
+    const values = device.vendor === 'ubiquiti-m5' ? [client.radioName, client.uptime, client.txRxSignalStrength, client.rxSignal, client.txRxCcq] : device.vendor === 'ubiquiti-ac' ? [client.radioName, client.uptime, client.txRxSignalStrength, client.txRxCcq] : [client.radioName, client.mac, client.uptime, client.txRxSignalStrength, client.txRxCcq];
+    const row = document.createElement('tr');
+    values.forEach((value) => { const cell = document.createElement('td'); cell.textContent = value || '—'; row.appendChild(cell); });
+    body.appendChild(row);
   });
-  metrics.appendChild(list);
+  table.append(head, body);
+  metrics.appendChild(table);
 }
 
 function renderCollectionData({ device, clients }) {
@@ -461,8 +450,8 @@ async function verifyDevice() {
   scanButton.disabled = true;
   pingButton.disabled = true;
   setRadioDetails('n/a');
-  scanStatus.textContent = 'Consultando dispositivo…';
-  setCollectionModal(true, 'Consultando dispositivo…');
+  scanStatus.textContent = '';
+  setCollectionModal(true, 'Aguarde…');
   const log = byId('collectionLog');
   if (log) log.replaceChildren();
   collectionLogBuffer = [];
@@ -470,9 +459,9 @@ async function verifyDevice() {
     if (!(await checkAccessSession())) return;
     const payload = await collectWithLiveLog(ip, vendorInput?.value || 'mikrotik');
     renderCollectionData(payload);
-    flushCollectionLog();
+    showFinalCollectionLog('Coleta concluída. Consulte o resumo e os clientes conectados.');
     pingButton.disabled = false;
-    scanStatus.textContent = `Consulta concluída às ${new Date(payload.device.collectedAt).toLocaleTimeString('pt-BR')}.`;
+    scanStatus.textContent = '';
   } catch (error) {
     setRadioDetails('err');
     scanStatus.textContent = error.message || 'Não foi possível consultar o dispositivo.';
@@ -480,6 +469,7 @@ async function verifyDevice() {
   } finally {
     scanButton.disabled = false;
     setCollectionModal(false);
+    ipInput.value = '';
   }
 }
 
