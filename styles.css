@@ -879,111 +879,6 @@ body {
   .monitor-action { width: 100%; }
 }
 
-/* Pacote visual cumulativo: navegação recolhida, consulta compacta e resumo estável. */
-.sidebar {
-  width: 72px;
-  flex: 0 0 72px;
-  padding: 22px 10px;
-  gap: 24px;
-  overflow: hidden;
-  transition: width .24s ease, flex-basis .24s ease, padding .24s ease;
-  position: relative;
-  z-index: 10;
-}
-.sidebar:hover, .sidebar:focus-within { width: 248px; flex-basis: 248px; padding: 26px 18px; }
-.brand { justify-content: center; min-width: 212px; }
-.brand__icon { width: 42px; height: 42px; flex: 0 0 42px; }
-.brand__text { opacity: 0; width: 0; overflow: hidden; white-space: nowrap; transition: opacity .18s ease, width .24s ease; }
-.sidebar:hover .brand, .sidebar:focus-within .brand { justify-content: flex-start; }
-.sidebar:hover .brand__text, .sidebar:focus-within .brand__text { opacity: 1; width: auto; }
-.navigation { min-width: 212px; }
-.nav-label { opacity: 0; height: 0; margin: 0; overflow: hidden; transition: opacity .18s ease; }
-.sidebar:hover .nav-label, .sidebar:focus-within .nav-label { opacity: 1; height: auto; margin-bottom: 12px; }
-.nav-link { font-size: 0; justify-content: center; min-height: 48px; margin-bottom: 6px; transition: background .2s ease, color .2s ease, font-size .18s ease; }
-.nav-link__icon { flex: 0 0 32px; }
-.sidebar:hover .nav-link, .sidebar:focus-within .nav-link { justify-content: flex-start; font-size: 13px; }
-.sidebar-card { min-width: 212px; margin-top: auto; padding: 15px 12px; }
-.sidebar-card__label, .sidebar-card__text, .sidebar-card__message { opacity: 0; transition: opacity .18s ease; }
-.sidebar:hover .sidebar-card__label, .sidebar:hover .sidebar-card__text, .sidebar:hover .sidebar-card__message,
-.sidebar:focus-within .sidebar-card__label, .sidebar:focus-within .sidebar-card__text, .sidebar:focus-within .sidebar-card__message { opacity: 1; }
-.sidebar-card__status { justify-content: center; margin-top: 0; }
-.sidebar:hover .sidebar-card__status, .sidebar:focus-within .sidebar-card__status { justify-content: flex-start; margin-top: 8px; }
-.main { transition: padding .24s ease; }
-.topbar { position: relative; min-height: 66px; }
-.topbar__left { flex: 1; text-align: center; }
-.topbar__kicker { display: block; color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
-.topbar h1 { margin: 6px 0 0; color: #fff; font-size: clamp(25px, 2.7vw, 36px); font-weight: 800; }
-.topbar h1::after { content: ''; display: block; width: 34px; height: 2px; margin: 10px auto 0; border-radius: 2px; background: var(--green); opacity: .75; }
-.topbar h1.tchum-title { animation: title-tchum .28s ease both; }
-@keyframes title-tchum { from { opacity: .2; transform: translateY(5px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.topbar__right { position: absolute; top: 0; right: 0; }
-.panel-form { min-height: 316px; display: flex; align-items: center; justify-content: center; }
-.consultation-card { width: min(360px, 100%); margin: auto; display: flex; flex-direction: column; align-items: center; gap: 0; text-align: center; }
-.radio-antenna { position: relative; width: 48px; height: 42px; margin-bottom: 12px; color: var(--green); }
-.radio-antenna::before { content: ''; position: absolute; left: 22px; bottom: 1px; width: 4px; height: 18px; border-radius: 3px; background: currentColor; }
-.radio-antenna::after { content: ''; position: absolute; left: 14px; bottom: 0; width: 20px; height: 4px; border-radius: 4px; background: currentColor; }
-.radio-antenna span { position: absolute; left: 10px; top: 0; width: 28px; height: 28px; border: 2px solid currentColor; border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; transform: rotate(-45deg); opacity: .8; }
-.radio-antenna span:nth-child(2) { left: 15px; top: 5px; width: 18px; height: 18px; opacity: .55; }
-.radio-antenna span:nth-child(3) { left: 21px; top: 11px; width: 6px; height: 6px; border: 0; border-radius: 50%; background: currentColor; opacity: 1; }
-.consultation-label { color: var(--text); font-size: 15px; font-weight: 700; letter-spacing: .04em; }
-.consultation-label span { color: var(--green); padding: 0 4px; }
-.consultation-card .input-row { width: 100%; max-width: 330px; margin-top: 28px; flex-direction: column; gap: 14px; }
-.consultation-card .input-row input[type="text"] { width: 100%; min-height: 44px; text-align: center; }
-.consultation-card .primary-button { width: min(190px, 100%); min-height: 42px; }
-.consultation-card .status-text { min-height: 20px; margin-top: 13px; }
-.panel-health { position: relative; min-height: 316px; }
-.monitor-stack { height: calc(100% - 72px); }
-.monitor-window__body { min-height: 0; }
-.ping-terminal { height: 150px; overflow-y: auto; color: #55f2a1; font: 12px/1.75 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; }
-.ping-terminal .ping-line { display: block; }
-.ping-terminal .ping-summary-line { display: block; margin-top: 7px; color: #b3ffd2; }
-.health-summary-panel { margin-top: 24px; }
-.health-summary-panel .panel__header, .history-heading { text-align: center; justify-content: center; }
-.health-summary-panel .panel__header > div, .history-heading > div { width: 100%; }
-.health-summary-panel .panel__kicker, .history-heading .panel__kicker { color: var(--green); }
-.health-summary-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.health-summary-clients { margin-top: 18px; }
-.health-summary-clients h3 { text-align: left; color: var(--text); }
-.health-summary-empty { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--text-soft); text-align: center; }
-.health-summary-client-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.health-summary-client-table th, .health-summary-client-table td { padding: 9px 10px; border-bottom: 1px solid rgba(43, 85, 112, .6); text-align: left; }
-.health-summary-client-table th { color: var(--text-light); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
-.health-summary-client-table td { color: var(--text-soft); }
-.help-tchum { position: absolute; top: 18px; right: 18px; z-index: 4; }
-.help-tchum__trigger { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--green); background: var(--panel-soft); font-weight: 800; cursor: help; }
-.help-tchum__card { position: absolute; top: 36px; right: 0; width: 220px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #0b1c2b; box-shadow: 0 18px 40px rgba(0,0,0,.38); opacity: 0; pointer-events: none; transform: translateY(-6px) scale(.96); transform-origin: top right; transition: opacity .18s ease, transform .18s ease; }
-.help-tchum:hover .help-tchum__card, .help-tchum:focus-within .help-tchum__card { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-.help-tchum__card strong, .help-tchum__card span { display: block; }
-.help-tchum__card strong { margin-bottom: 6px; color: #fff; }
-.help-tchum__card span { color: var(--text-soft); font-size: 12px; line-height: 1.5; }
-.collection-log-panel { margin-top: 18px; }
-.collection-log { min-height: 100px; max-height: 160px; }
-.history-heading { margin: 14px 0 24px; }
-.history-heading h2 { color: #fff; }
-
-@media (max-width: 960px) {
-  .health-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 720px) {
-  .sidebar { width: 60px; flex-basis: 60px; padding: 18px 7px; }
-  .sidebar:hover, .sidebar:focus-within { width: 218px; flex-basis: 218px; padding: 20px 14px; }
-  .main { padding: 22px 16px; }
-  .topbar__right { position: static; }
-  .topbar { flex-direction: column; align-items: stretch; }
-  .topbar__left { order: 1; }
-  .topbar__right { order: 2; justify-content: flex-end; }
-  .content-grid { grid-template-columns: 1fr; }
-  .panel-form, .panel-health { min-height: 0; }
-  .monitor-stack { height: auto; }
-  .health-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 480px) {
-  .health-summary-grid { grid-template-columns: 1fr; }
-  .health-summary-client-table { min-width: 520px; }
-  .clients-table-wrap { overflow-x: auto; }
-  .consultation-card .input-row { max-width: 280px; }
-}
-
 @keyframes pulse {
   70% {
     box-shadow: 0 0 0 12px rgba(34, 181, 115, 0);
@@ -1240,4 +1135,822 @@ body {
   .topbar { align-items: flex-start; flex-direction: column; }
   .topbar__right { width: 100%; justify-content: space-between; }
   .agent-status-card { flex: 1; min-width: 0; }
+}
+
+
+/* ========================================================================== */
+/* Dashboard consolidado: coleta à esquerda, resultados completos à direita.  */
+/* ========================================================================== */
+.dashboard-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(310px, 0.68fr) minmax(0, 1.45fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.collection-panel {
+  min-width: 0;
+}
+
+.collection-panel .verification {
+  margin-top: 0;
+}
+
+.collection-panel h2 {
+  margin: 7px 0 0;
+  font-size: 25px;
+  letter-spacing: -0.025em;
+}
+
+.collection-panel__hint {
+  margin: 10px 0 24px;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.collection-input-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.collection-input-row input[type="text"],
+.collection-input-row select,
+.collection-input-row .primary-button {
+  width: 100%;
+  min-width: 0;
+}
+
+.collection-input-row .primary-button {
+  margin-top: 2px;
+}
+
+.collection-panel .status-text {
+  min-height: 18px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.results-panel {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.results-panel__header {
+  margin-bottom: 2px;
+}
+
+.results-device-profile {
+  margin-top: 0;
+  padding: 18px;
+}
+
+.results-device-profile .device-grid {
+  margin-top: 16px;
+  gap: 12px;
+}
+
+.results-device-profile .device-detail {
+  padding: 12px 13px;
+}
+
+.results-device-profile .device-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.results-device-profile .device-icon svg {
+  width: 29px;
+  height: 29px;
+}
+
+.results-section {
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.results-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.results-section__header h3 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  letter-spacing: -0.015em;
+}
+
+.results-section__badge {
+  flex: 0 0 auto;
+}
+
+.results-panel .clients-table-wrap {
+  max-height: 310px;
+  overflow: auto;
+  margin-top: 12px;
+}
+
+.results-panel .clients-table {
+  min-width: 620px;
+  font-size: 12px;
+}
+
+.results-panel .clients-table th,
+.results-panel .clients-table td {
+  padding: 11px 12px;
+}
+
+.compact-ping-window {
+  background: #050c14;
+}
+
+.compact-ping-window .monitor-window__header {
+  padding: 12px 14px;
+}
+
+.compact-ping-window .monitor-window__header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.compact-ping-window .monitor-window__body {
+  padding: 13px 14px 15px;
+  min-height: 0;
+}
+
+.ping-terminal {
+  display: grid;
+  gap: 7px;
+  color: var(--text-soft);
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.ping-terminal__line {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1.3fr);
+  gap: 12px;
+  align-items: baseline;
+}
+
+.ping-terminal__line span {
+  color: var(--text-light);
+}
+
+.ping-terminal__line strong {
+  color: var(--text);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.ping-terminal__line.is-online strong {
+  color: var(--green);
+}
+
+.ping-terminal__line.is-offline strong {
+  color: var(--red);
+}
+
+@media (max-width: 1180px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-input-row {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, .8fr) auto;
+    align-items: center;
+  }
+
+  .collection-input-row .primary-button {
+    width: auto;
+    min-width: 120px;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .collection-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-input-row .primary-button {
+    width: 100%;
+  }
+
+  .results-section__header,
+  .results-panel__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .results-device-profile .device-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ping-terminal__line {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+/* Menu lateral recolhível — versão integrada ao dashboard compacto. */
+.sidebar {
+  width: 72px;
+  flex: 0 0 72px;
+  padding: 22px 10px;
+  gap: 24px;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  transition: width .24s ease, flex-basis .24s ease, padding .24s ease;
+}
+
+.sidebar:hover,
+.sidebar:has(:focus-visible) {
+  width: 248px;
+  flex-basis: 248px;
+  padding: 26px 18px;
+}
+
+.brand {
+  justify-content: center;
+  min-width: 212px;
+}
+
+.brand__icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+}
+
+.brand__text {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity .18s ease, width .24s ease;
+}
+
+.sidebar:hover .brand,
+.sidebar:has(:focus-visible) .brand {
+  justify-content: flex-start;
+}
+
+.sidebar:hover .brand__text,
+.sidebar:has(:focus-visible) .brand__text {
+  width: auto;
+  opacity: 1;
+}
+
+.navigation {
+  min-width: 212px;
+}
+
+.nav-label {
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity .18s ease;
+}
+
+.sidebar:hover .nav-label,
+.sidebar:has(:focus-visible) .nav-label {
+  height: auto;
+  margin-bottom: 12px;
+  opacity: 1;
+}
+
+.nav-link {
+  min-height: 48px;
+  margin-bottom: 6px;
+  justify-content: center;
+  font-size: 0;
+  white-space: nowrap;
+  transition: background .2s ease, color .2s ease, font-size .18s ease;
+}
+
+.nav-link__icon {
+  flex: 0 0 32px;
+}
+
+.sidebar:hover .nav-link,
+.sidebar:has(:focus-visible) .nav-link {
+  justify-content: flex-start;
+  font-size: 13px;
+}
+
+.sidebar-card {
+  min-width: 212px;
+  margin-top: auto;
+  padding: 15px 12px;
+}
+
+.sidebar-card__label,
+.sidebar-card__text,
+.sidebar-card__message {
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+
+.sidebar:hover .sidebar-card__label,
+.sidebar:hover .sidebar-card__text,
+.sidebar:hover .sidebar-card__message,
+.sidebar:has(:focus-visible) .sidebar-card__label,
+.sidebar:has(:focus-visible) .sidebar-card__text,
+.sidebar:has(:focus-visible) .sidebar-card__message {
+  opacity: 1;
+}
+
+.sidebar-card__status {
+  justify-content: center;
+  margin-top: 0;
+}
+
+.sidebar:hover .sidebar-card__status,
+.sidebar:has(:focus-visible) .sidebar-card__status {
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.main {
+  transition: padding .24s ease;
+}
+
+/* Nesta versão o status do agente fica dentro do menu lateral. */
+.agent-status-card {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    flex-direction: row;
+  }
+
+  .sidebar {
+    width: 64px;
+    flex: 0 0 64px;
+    padding: 18px 7px;
+  }
+
+  .sidebar:hover,
+  .sidebar:has(:focus-visible) {
+    width: 224px;
+    flex-basis: 224px;
+    padding: 20px 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .sidebar {
+    width: 58px;
+    flex-basis: 58px;
+    padding: 16px 5px;
+  }
+
+  .sidebar:hover,
+  .sidebar:has(:focus-visible) {
+    width: 210px;
+    flex-basis: 210px;
+    padding: 18px 12px;
+  }
+
+  .brand,
+  .navigation,
+  .sidebar-card {
+    min-width: 186px;
+  }
+}
+
+
+/* ========================================================================== */
+/* Card de coleta: mantém EXATAMENTE o espaço externo da versão aprovada.     */
+/* Só reposiciona o conteúdo internamente e destaca o status no rodapé.       */
+/* ========================================================================== */
+
+/* O texto deixa de aparecer, mas continua reservando o mesmo espaço que já
+   existia. Assim o tamanho do card não muda em nenhuma largura de tela. */
+.collection-panel__hint--ghost {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Sobe somente os controles visualmente, sem alterar o fluxo/altura do card. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row {
+  transform: translateY(-22px);
+}
+
+/* Mantém o mesmo "orçamento" vertical do status anterior:
+   antes = 18px mínimos + 12px de margem; agora = 28px + 2px. */
+.collection-panel .status-text--dock {
+  height: 28px;
+  min-height: 28px;
+  margin-top: 2px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(86, 161, 194, .34);
+  background: rgba(86, 161, 194, .08);
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.collection-panel .status-text--dock.is-info {
+  border-color: rgba(86, 161, 194, .34);
+  background: rgba(86, 161, 194, .08);
+  color: var(--text-soft);
+}
+
+.collection-panel .status-text--dock.is-loading {
+  border-color: rgba(20, 214, 154, .45);
+  background: rgba(20, 214, 154, .09);
+  color: var(--green);
+}
+
+.collection-panel .status-text--dock.is-success {
+  border-color: rgba(20, 214, 154, .46);
+  background: rgba(20, 214, 154, .12);
+  color: var(--green);
+}
+
+.collection-panel .status-text--dock.is-error {
+  border-color: rgba(239, 107, 115, .52);
+  background: rgba(239, 107, 115, .12);
+  color: #ffabb1;
+}
+
+/* No layout de uma coluna, mantém o mesmo princípio: nada de height/min-height. */
+@media (max-width: 760px) {
+  .collection-panel .control-label,
+  .collection-panel .collection-input-row {
+    transform: translateY(-18px);
+  }
+}
+
+/* ========================================================================== */
+/* Card de coleta: conteúdo compacto e centralizado, sem alterar o card.       */
+/* ========================================================================== */
+
+/* Mantém o tamanho/posição do card externo e limita somente o miolo. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row,
+.collection-panel .status-text--dock {
+  width: min(100%, 300px);
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* O rótulo acompanha a largura dos controles, mas continua fácil de ler. */
+.collection-panel .control-label {
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+/* Campos menores: largura suficiente para "Detectar automaticamente". */
+.collection-panel .collection-input-row {
+  gap: 9px;
+}
+
+.collection-panel .collection-input-row input[type="text"],
+.collection-panel .collection-input-row select {
+  min-height: 43px;
+  height: 43px;
+  padding: 10px 13px;
+  border-radius: 12px;
+  font-size: 13.5px;
+}
+
+.collection-panel .collection-input-row .primary-button {
+  width: 100%;
+  min-height: 43px;
+  height: 43px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+/* Status continua no rodapé visual, agora alinhado ao bloco compacto. */
+.collection-panel .status-text--dock {
+  justify-content: center;
+  text-align: center;
+  padding-left: 9px;
+  padding-right: 9px;
+  font-size: 10.5px;
+}
+
+@media (max-width: 560px) {
+  .collection-panel .control-label,
+  .collection-panel .collection-input-row,
+  .collection-panel .status-text--dock {
+    width: min(100%, 280px);
+    max-width: 280px;
+  }
+}
+
+/* ========================================================================== */
+/* Ajuste fino: mantém o card e o tamanho dos controles; reduz só a largura.  */
+/* ========================================================================== */
+
+/* O grupo fica centralizado e com largura próxima ao conteúdo mais longo
+   ("Detectar automaticamente"), sem encolher fonte, altura ou espaçamento. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row,
+.collection-panel .status-text--dock {
+  width: min(100%, 240px);
+  max-width: 240px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Restaura as dimensões originais dos campos: compactação apenas horizontal. */
+.collection-panel .control-label {
+  font-size: 11px;
+  letter-spacing: .16em;
+}
+
+.collection-panel .collection-input-row {
+  gap: 12px;
+}
+
+.collection-panel .collection-input-row input[type="text"],
+.collection-panel .collection-input-row select {
+  min-height: 50px;
+  height: 50px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.collection-panel .collection-input-row .primary-button {
+  width: 100%;
+  min-height: 50px;
+  height: 50px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+/* O status acompanha a mesma largura e pode quebrar em duas linhas,
+   permanecendo preso visualmente no rodapé do card. */
+.collection-panel .status-text--dock {
+  height: auto;
+  min-height: 36px;
+  padding: 6px 10px;
+  justify-content: center;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+@media (max-width: 560px) {
+  .collection-panel .control-label,
+  .collection-panel .collection-input-row,
+  .collection-panel .status-text--dock {
+    width: min(100%, 240px);
+    max-width: 240px;
+  }
+}
+
+/* ========================================================================== */
+/* Card de coleta: visual em camadas + borda gradiente animada.               */
+/* Mantém o espaço externo do card; a mudança é somente visual/interna.       */
+/* ========================================================================== */
+
+/* Card externo: fundo escuro e contorno RGB/gradiente em movimento. */
+.collection-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border: 0;
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(7, 20, 36, .96), rgba(4, 16, 30, .98));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, .28),
+    0 0 26px rgba(25, 188, 225, .05);
+}
+
+.collection-panel::before,
+.collection-panel::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: 30px;
+  background: linear-gradient(
+    115deg,
+    #2f6fff 0%,
+    #21c9ff 18%,
+    #18e4c0 38%,
+    #15d89a 52%,
+    #7b5cff 72%,
+    #3d78ff 88%,
+    #2f6fff 100%
+  );
+  background-size: 260% 260%;
+  animation: collectionBorderFlow 8s ease-in-out infinite;
+}
+
+/* Deixa o gradiente aparecer só no contorno. */
+.collection-panel::before {
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Brilho discreto atrás da borda. */
+.collection-panel::after {
+  opacity: .28;
+  filter: blur(18px);
+}
+
+@keyframes collectionBorderFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Painel interno, como no exemplo enviado. */
+.collection-panel .verification {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 28px;
+  border: 1px solid rgba(63, 113, 151, .48);
+  border-radius: 21px;
+  background: linear-gradient(145deg, rgba(7, 24, 41, .90), rgba(5, 19, 33, .94));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .012),
+    0 14px 32px rgba(0, 0, 0, .16);
+}
+
+/* O exemplo não mostra o kicker "Coleta". */
+.collection-panel .panel__kicker {
+  display: none;
+}
+
+/* Remove o espaço fantasma da antiga frase sem mexer no card externo. */
+.collection-panel__hint--ghost {
+  display: none;
+}
+
+.collection-panel h2 {
+  margin: 0 0 34px;
+  font-size: 27px;
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+
+/* Cancela o deslocamento das versões anteriores e usa o painel interno. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row {
+  transform: none;
+}
+
+/* Controles ocupam apenas o painel interno, todos perfeitamente alinhados. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row,
+.collection-panel .status-text--dock {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.collection-panel .control-label {
+  margin-bottom: 14px;
+  font-size: 11px;
+  letter-spacing: .20em;
+}
+
+.collection-panel .collection-input-row {
+  margin-top: 0;
+  gap: 18px;
+}
+
+.collection-panel .collection-input-row input[type="text"],
+.collection-panel .collection-input-row select {
+  height: 58px;
+  min-height: 58px;
+  padding: 15px 18px;
+  border-radius: 13px;
+  border-color: rgba(65, 126, 166, .54);
+  background: rgba(12, 35, 55, .88);
+  font-size: 17px;
+}
+
+.collection-panel .collection-input-row .primary-button {
+  height: 59px;
+  min-height: 59px;
+  margin-top: 4px;
+  border-radius: 12px;
+  font-size: 17px;
+  box-shadow: 0 0 26px rgba(20, 214, 154, .13);
+}
+
+/* Status vira a faixa inferior do exemplo. */
+.collection-panel .status-text--dock {
+  min-height: 46px;
+  margin-top: 25px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.collection-panel .status-text--dock.is-info {
+  border-color: rgba(71, 128, 165, .48);
+  background: rgba(22, 48, 67, .46);
+}
+
+.collection-panel .status-text--dock.is-loading,
+.collection-panel .status-text--dock.is-success {
+  border-color: rgba(20, 214, 154, .55);
+  background: rgba(20, 214, 154, .11);
+  color: #52e4b6;
+}
+
+.collection-panel .status-text--dock.is-error {
+  border-color: rgba(255, 91, 112, .62);
+  background: rgba(151, 39, 57, .20);
+  color: #ff9aa8;
+}
+
+/* Ajuste responsivo sem perder a aparência do card. */
+@media (max-width: 560px) {
+  .collection-panel .verification {
+    padding: 22px;
+  }
+
+  .collection-panel h2 {
+    margin-bottom: 28px;
+    font-size: 24px;
+  }
+
+  .collection-panel .collection-input-row input[type="text"],
+  .collection-panel .collection-input-row select,
+  .collection-panel .collection-input-row .primary-button {
+    height: 54px;
+    min-height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-panel::before,
+  .collection-panel::after {
+    animation: none;
+  }
+}
+
+/* Ajuste final: campos médios, centralizados e alinhados sem alterar o tamanho do card. */
+.collection-panel .control-label,
+.collection-panel .collection-input-row,
+.collection-panel .status-text--dock {
+  width: min(100%, 340px);
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.collection-panel .collection-input-row input[type="text"],
+.collection-panel .collection-input-row select,
+.collection-panel .collection-input-row .primary-button {
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .collection-panel .control-label,
+  .collection-panel .collection-input-row,
+  .collection-panel .status-text--dock {
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
+
+/* IP inicia vazio e o texto digitado fica centralizado. */
+.collection-panel #ipInput {
+  text-align: center;
 }

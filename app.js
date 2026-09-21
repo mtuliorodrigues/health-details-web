@@ -72,11 +72,19 @@ function setText(id, value) {
   if (element) element.textContent = value ?? 'n/a';
 }
 
+function setScanStatus(message, state = 'info') {
+  if (!scanStatus) return;
+  scanStatus.textContent = message;
+  scanStatus.title = message;
+  scanStatus.classList.remove('is-info', 'is-loading', 'is-success', 'is-error');
+  scanStatus.classList.add(`is-${state}`);
+}
+
 function setRadioDetails(value) {
   ['deviceSignalTx', 'deviceSignalRx', 'deviceCcq'].forEach((id) => setText(id, value));
 }
 
-function setCollectionModal(visible, message = 'Aguarde…') {
+function setCollectionModal(visible, message = 'Preparando a coleta…') {
   if (!collectionModal) return;
   collectionModal.hidden = !visible;
   if (collectionModalStatus) collectionModalStatus.textContent = message;
@@ -91,21 +99,6 @@ function showView(view) {
   dashboardNav?.classList.toggle('active', !showHistory && !showCollectionLog);
   historyNav?.classList.toggle('active', showHistory);
   collectionLogNav?.classList.toggle('active', showCollectionLog);
-  const titles = {
-    dashboard: ['Diagnóstico', 'Host Health Diagnostic'],
-    history: ['Registros', 'Histórico'],
-    'collection-log': ['Atividade', 'Log de Coletas']
-  };
-  const [kicker, title] = titles[view] || titles.dashboard;
-  const titleElement = byId('sectionTitle');
-  const kickerElement = byId('sectionKicker');
-  if (titleElement) {
-    titleElement.classList.remove('tchum-title');
-    void titleElement.offsetWidth;
-    titleElement.textContent = title;
-    titleElement.classList.add('tchum-title');
-  }
-  if (kickerElement) kickerElement.textContent = kicker;
   if (showHistory) loadHistory();
 }
 
@@ -117,13 +110,28 @@ function renderPing(ping) {
     target.textContent = 'Ping não retornou dados.';
     return;
   }
+
   const sent = ping.packets?.sent ?? 0;
   const received = ping.packets?.received ?? 0;
   const loss = ping.packets?.loss ?? 100;
-  const line = (text, className = 'ping-line') => { const element = document.createElement('span'); element.className = className; element.textContent = text; target.appendChild(element); };
-  line(`Ping: ${ping.success ? 'Online' : 'Sem resposta'}`);
-  for (let index = 0; index < 4; index += 1) line(`Resposta ${index + 1}: ${index < received ? 'recebida' : 'sem resposta'}`);
-  line(`Estatísticas: enviados=${sent} · recebidos=${received} · perdidos=${loss}% · latência média=${ping.latency == null ? 'indisponível' : `${ping.latency} ms`}`, 'ping-summary-line');
+  const latency = ping.latency == null ? 'indisponível' : `${ping.latency} ms`;
+
+  const addLine = (label, value, className = '') => {
+    const line = document.createElement('div');
+    line.className = `ping-terminal__line ${className}`.trim();
+    const labelElement = document.createElement('span');
+    labelElement.textContent = label;
+    const valueElement = document.createElement('strong');
+    valueElement.textContent = value;
+    line.append(labelElement, valueElement);
+    target.appendChild(line);
+  };
+
+  addLine('Status', ping.success ? 'Online' : 'Sem resposta', ping.success ? 'is-online' : 'is-offline');
+  addLine('Pacotes', `${received} recebidos de ${sent}`);
+  addLine('Perda', `${loss}%`);
+  addLine('Latência média', latency);
+
   lastPing = ping;
   renderHealthSummary();
 }
@@ -154,22 +162,34 @@ function renderHealthSummary() {
   title.textContent = 'Principais métricas dos clientes';
   metrics.appendChild(title);
   if (!clients.length) { const empty = document.createElement('p'); empty.textContent = 'Nenhum cliente conectado foi encontrado.'; metrics.appendChild(empty); return; }
-  const table = document.createElement('table');
-  table.className = 'health-summary-client-table';
-  const head = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  const headers = device.vendor === 'ubiquiti-m5' ? ['Nome', 'Conexão', 'Tx Signal', 'Rx Signal', 'CCQ'] : device.vendor === 'ubiquiti-ac' ? ['Nome', 'Conexão', 'Signal', 'Remote Signal'] : ['Nome', 'MAC', 'Conexão', 'Sinal', 'CCQ'];
-  headers.forEach((label) => { const cell = document.createElement('th'); cell.textContent = label; headRow.appendChild(cell); });
-  head.appendChild(headRow);
-  const body = document.createElement('tbody');
+  const list = document.createElement('div');
+  list.className = 'health-summary-client-list';
   clients.slice(0, 8).forEach((client) => {
-    const values = device.vendor === 'ubiquiti-m5' ? [client.radioName, client.uptime, client.txRxSignalStrength, client.rxSignal, client.txRxCcq] : device.vendor === 'ubiquiti-ac' ? [client.radioName, client.uptime, client.txRxSignalStrength, client.txRxCcq] : [client.radioName, client.mac, client.uptime, client.txRxSignalStrength, client.txRxCcq];
-    const row = document.createElement('tr');
-    values.forEach((value) => { const cell = document.createElement('td'); cell.textContent = value || '—'; row.appendChild(cell); });
-    body.appendChild(row);
+    const item = document.createElement('div');
+    item.className = 'health-summary-client';
+    const name = document.createElement('strong');
+    name.textContent = client.radioName || 'Cliente sem nome';
+    const details = document.createElement('span');
+    const values = [];
+    if (device.vendor === 'ubiquiti-m5') {
+      if (client.txRxSignalStrength) values.push(`Tx ${client.txRxSignalStrength}`);
+      if (client.rxSignal) values.push(`Rx ${client.rxSignal}`);
+      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    } else if (device.vendor === 'ubiquiti-ac') {
+      if (client.txRxSignalStrength) values.push(`Signal ${client.txRxSignalStrength}`);
+      if (client.txRxCcq) values.push(`Remote Signal ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    } else {
+      if (client.mac) values.push(`MAC ${client.mac}`);
+      if (client.txRxSignalStrength) values.push(`Sinal ${client.txRxSignalStrength}`);
+      if (client.txRxCcq) values.push(`CCQ ${client.txRxCcq}`);
+      if (client.uptime) values.push(`Conexão ${client.uptime}`);
+    }
+    details.textContent = values.length ? values.join(' · ') : 'Métricas indisponíveis';
+    item.append(name, details); list.appendChild(item);
   });
-  table.append(head, body);
-  metrics.appendChild(table);
+  metrics.appendChild(list);
 }
 
 function renderCollectionData({ device, clients }) {
@@ -443,15 +463,15 @@ async function runPingDiagnostic() {
 async function verifyDevice() {
   const ip = ipInput?.value.trim() || '';
   if (!isValidPrivateIp(ip)) {
-    scanStatus.textContent = 'Informe um IPv4 privado válido (10/8, 172.16/12 ou 192.168/16).';
+    setScanStatus('Informe um IPv4 privado válido (10/8, 172.16/12 ou 192.168/16).', 'error');
     return;
   }
 
   scanButton.disabled = true;
   pingButton.disabled = true;
   setRadioDetails('n/a');
-  scanStatus.textContent = '';
-  setCollectionModal(true, 'Aguarde…');
+  setScanStatus('Consultando dispositivo…', 'loading');
+  setCollectionModal(true, 'Consultando dispositivo…');
   const log = byId('collectionLog');
   if (log) log.replaceChildren();
   collectionLogBuffer = [];
@@ -459,17 +479,16 @@ async function verifyDevice() {
     if (!(await checkAccessSession())) return;
     const payload = await collectWithLiveLog(ip, vendorInput?.value || 'mikrotik');
     renderCollectionData(payload);
-    showFinalCollectionLog('Coleta concluída. Consulte o resumo e os clientes conectados.');
+    flushCollectionLog();
     pingButton.disabled = false;
-    scanStatus.textContent = '';
+    setScanStatus(`Consulta concluída às ${new Date(payload.device.collectedAt).toLocaleTimeString('pt-BR')}.`, 'success');
   } catch (error) {
     setRadioDetails('err');
-    scanStatus.textContent = error.message || 'Não foi possível consultar o dispositivo.';
+    setScanStatus(error.message || 'Não foi possível consultar o dispositivo.', 'error');
     showFinalCollectionLog(scanStatus.textContent);
   } finally {
     scanButton.disabled = false;
     setCollectionModal(false);
-    ipInput.value = '';
   }
 }
 
@@ -483,14 +502,20 @@ function applyTheme(theme) {
 
 scanButton?.addEventListener('click', verifyDevice);
 pingButton?.addEventListener('click', runPingDiagnostic);
-dashboardNav?.addEventListener('click', () => showView('dashboard'));
-historyNav?.addEventListener('click', () => showView('history'));
-collectionLogNav?.addEventListener('click', () => showView('collection-log'));
+function handleNavigationClick(view, event) {
+  showView(view);
+  // Evita que o botão clicado mantenha o menu lateral aberto pelo foco.
+  event?.currentTarget?.blur?.();
+}
+
+dashboardNav?.addEventListener('click', (event) => handleNavigationClick('dashboard', event));
+historyNav?.addEventListener('click', (event) => handleNavigationClick('history', event));
+collectionLogNav?.addEventListener('click', (event) => handleNavigationClick('collection-log', event));
 ipInput?.addEventListener('keydown', (event) => { if (event.key === 'Enter') verifyDevice(); });
 themeToggle?.addEventListener('click', () => applyTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
 historyFilterButton?.addEventListener('click', () => { historyState.page = 1; loadHistory(); });
 historyPrevious?.addEventListener('click', () => { if (historyState.page > 1) { historyState.page -= 1; loadHistory(); } });
 historyNext?.addEventListener('click', () => { if (historyState.page < historyState.totalPages) { historyState.page += 1; loadHistory(); } });
 applyTheme(localStorage.getItem('healthDetailsTheme') || 'light');
-checkAccessSession().then(() => checkAgentStatus()).catch((error) => { scanStatus.textContent = error.message; });
+checkAccessSession().then(() => checkAgentStatus()).catch((error) => { setScanStatus(error.message, 'error'); });
 window.setInterval(checkAgentStatus, 60_000);
