@@ -1954,3 +1954,306 @@ body {
 .collection-panel #ipInput {
   text-align: center;
 }
+
+/* ========================================================================== */
+/* Efeito gradiente animado nos cards principais do site                     */
+/* Mantém tamanhos, espaçamentos e conteúdo exatamente como estavam.          */
+/* ========================================================================== */
+
+.panel:not(.collection-panel),
+.sidebar-card,
+.agent-status-card,
+.access-card,
+.collection-modal__card {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+}
+
+.panel:not(.collection-panel)::before,
+.panel:not(.collection-panel)::after,
+.sidebar-card::before,
+.sidebar-card::after,
+.agent-status-card::before,
+.agent-status-card::after,
+.access-card::before,
+.access-card::after,
+.collection-modal__card::before,
+.collection-modal__card::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    #2f6fff 0%,
+    #21c9ff 18%,
+    #18e4c0 38%,
+    #15d89a 52%,
+    #7b5cff 72%,
+    #3d78ff 88%,
+    #2f6fff 100%
+  );
+  background-size: 260% 260%;
+  animation: collectionBorderFlow 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* O primeiro pseudo-elemento vira somente o contorno colorido. */
+.panel:not(.collection-panel)::before,
+.sidebar-card::before,
+.agent-status-card::before,
+.access-card::before,
+.collection-modal__card::before {
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* O segundo cria o mesmo brilho suave do card de coleta. */
+.panel:not(.collection-panel)::after,
+.sidebar-card::after,
+.agent-status-card::after,
+.access-card::after,
+.collection-modal__card::after {
+  opacity: .22;
+  filter: blur(16px);
+}
+
+/* O histórico usa <details>; permite que o brilho apareça fora do contorno. */
+.history-dropdown.panel {
+  overflow: visible;
+}
+
+/* Mantém o efeito agradável em telas pequenas, sem aumentar o glow. */
+@media (max-width: 760px) {
+  .panel:not(.collection-panel)::after,
+  .sidebar-card::after,
+  .agent-status-card::after,
+  .access-card::after,
+  .collection-modal__card::after {
+    opacity: .16;
+    filter: blur(12px);
+  }
+}
+
+
+/* ========================================================================== */
+/* Ajuste final solicitado: todos os cards + área de coleta centralizada      */
+/* ========================================================================== */
+
+/* Área de coleta: remove dependência do antigo label e centraliza tudo. */
+.collection-panel .verification {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.collection-panel h2 {
+  width: 100%;
+  text-align: center;
+}
+
+.collection-panel .collection-input-row,
+.collection-panel .status-text--dock {
+  width: min(100%, 340px);
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.collection-panel .collection-input-row {
+  align-items: stretch;
+}
+
+.collection-panel #ipInput,
+.collection-panel #vendorInput,
+.collection-panel #scanButton,
+.collection-panel .status-text--dock {
+  text-align: center;
+}
+
+.collection-panel #vendorInput {
+  text-align-last: center;
+}
+
+.collection-panel #ipInput::placeholder {
+  text-align: center;
+  color: var(--text-soft);
+  opacity: .82;
+}
+
+/*
+  Borda de gradiente animado aplicada em TODAS as superfícies que funcionam
+  visualmente como cards no painel, inclusive cards internos e dinâmicos.
+  O pseudo-elemento fica dentro da própria borda, então não altera tamanho,
+  espaçamento ou alinhamento dos componentes.
+*/
+:is(
+  .panel:not(.collection-panel),
+  .sidebar-card,
+  .agent-status-card,
+  .access-card,
+  .collection-modal__card,
+  .device-profile,
+  .device-detail,
+  .clients-table-wrap,
+  .monitor-window,
+  .history-host-detail,
+  .health-summary-item,
+  .health-summary-client,
+  .collection-log
+) {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent !important;
+}
+
+/* Desativa o glow antigo genérico para evitar dois efeitos sobrepostos. */
+:is(
+  .panel:not(.collection-panel),
+  .sidebar-card,
+  .agent-status-card,
+  .access-card,
+  .collection-modal__card,
+  .device-profile,
+  .device-detail,
+  .clients-table-wrap,
+  .monitor-window,
+  .history-host-detail,
+  .health-summary-item,
+  .health-summary-client,
+  .collection-log
+)::after {
+  display: none !important;
+}
+
+/* Contorno RGB/gradiente animado consistente em todos os cards. */
+:is(
+  .panel:not(.collection-panel),
+  .sidebar-card,
+  .agent-status-card,
+  .access-card,
+  .collection-modal__card,
+  .device-profile,
+  .device-detail,
+  .clients-table-wrap,
+  .monitor-window,
+  .history-host-detail,
+  .health-summary-item,
+  .health-summary-client,
+  .collection-log
+)::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2 !important;
+  padding: 2px !important;
+  border-radius: inherit !important;
+  background: linear-gradient(
+    115deg,
+    #2f6fff 0%,
+    #21c9ff 18%,
+    #18e4c0 38%,
+    #15d89a 52%,
+    #7b5cff 72%,
+    #3d78ff 88%,
+    #2f6fff 100%
+  ) !important;
+  background-size: 260% 260% !important;
+  animation: collectionBorderFlow 8s ease-in-out infinite !important;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  pointer-events: none !important;
+  filter: drop-shadow(0 0 7px rgba(33, 201, 255, .14));
+}
+
+/* Cards dinâmicos do histórico precisam deixar o contorno visível. */
+.history-dropdown.panel {
+  overflow: visible;
+}
+
+/* Mantém o recorte interno da tabela/monitor sem perder a borda visual. */
+.clients-table-wrap,
+.monitor-window,
+.collection-log {
+  background-clip: padding-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .panel:not(.collection-panel),
+    .sidebar-card,
+    .agent-status-card,
+    .access-card,
+    .collection-modal__card,
+    .device-profile,
+    .device-detail,
+    .clients-table-wrap,
+    .monitor-window,
+    .history-host-detail,
+    .health-summary-item,
+    .health-summary-client,
+    .collection-log
+  )::before {
+    animation: none !important;
+  }
+}
+
+/* ========================================================================== */
+/* Títulos grandes com gradiente verde Matrix / neon — FORTE                  */
+/* ========================================================================== */
+
+:is(
+  .topbar h1,
+  .history-heading h2,
+  .access-card h1,
+  .brand__text
+) {
+  color: #35ff83;
+  background: linear-gradient(
+    90deg,
+    #064d29 0%,
+    #00ff66 20%,
+    #39ff91 42%,
+    #0acb59 60%,
+    #a8ffd0 78%,
+    #00ff66 90%,
+    #064d29 100%
+  );
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 8px rgba(0, 255, 102, .30),
+    0 0 18px rgba(0, 255, 102, .22),
+    0 0 26px rgba(57, 255, 145, .10);
+  animation: matrixTitleFlow 4.5s linear infinite;
+}
+
+@keyframes matrixTitleFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .topbar h1,
+    .history-heading h2,
+    .access-card h1,
+    .brand__text
+  ) {
+    animation: none;
+    background-position: 50% 50%;
+    filter: none;
+  }
+}
